@@ -1,0 +1,13 @@
+target,target_column,model,Random_CV_R2_mean,Random_CV_R2_std,Spatial_CV_R2_mean,Spatial_CV_R2_std,Spatial_Generalization_Gap_R2,Random_CV_RMSE,Spatial_CV_RMSE,Random_CV_MAE,Spatial_CV_MAE
+Chromium (Cr),chromium_mg_kg,Random Forest,0.2404,0.0621,-4.5609,7.0681,4.8012,80.509,114.145,51.588,93.378
+Chromium (Cr),chromium_mg_kg,XGBoost,0.2114,0.0821,-5.6243,9.5683,5.8356,82.137,112.771,52.915,90.766
+Chromium (Cr),chromium_mg_kg,LightGBM,0.2308,0.0731,-6.7592,10.541,6.99,80.993,125.423,52.364,102.609
+Lead (Pb),lead_mg_kg,Random Forest,0.4322,0.0516,-0.7665,0.5678,1.1986,19.075,22.27,13.55,17.82
+Lead (Pb),lead_mg_kg,XGBoost,0.4316,0.1043,-1.0229,0.8291,1.4545,19.102,23.495,13.473,18.716
+Lead (Pb),lead_mg_kg,LightGBM,0.3786,0.1024,-0.9291,0.8198,1.3076,19.922,23.142,13.922,18.444
+Cadmium (Cd),cadmium_mg_kg,Random Forest,0.1825,0.0535,-0.4848,0.3685,0.6673,0.483,0.523,0.321,0.398
+Cadmium (Cd),cadmium_mg_kg,XGBoost,0.1228,0.0359,-0.423,0.2616,0.5458,0.501,0.517,0.336,0.376
+Cadmium (Cd),cadmium_mg_kg,LightGBM,0.165,0.0618,-0.3916,0.2199,0.5566,0.49,0.508,0.33,0.379
+Nickel (Ni),nickel_mg_kg,Random Forest,0.2957,0.1032,-1.9627,1.4791,2.2584,26.595,40.158,17.518,33.686
+Nickel (Ni),nickel_mg_kg,XGBoost,0.2661,0.13,-1.751,1.0751,2.0171,26.985,39.476,17.921,32.62
+Nickel (Ni),nickel_mg_kg,LightGBM,0.2959,0.081,-1.8159,1.2726,2.1119,26.594,39.494,17.855,32.762

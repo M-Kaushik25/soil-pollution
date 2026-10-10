@@ -1,0 +1,21 @@
+target,target_column,ablation_tier,num_features,R2_mean,R2_std,MAE_mean,RMSE_mean
+Chromium (Cr),chromium_mg_kg,Model A: Soil Only,11,-0.2484,0.0633,71.827,102.378
+Chromium (Cr),chromium_mg_kg,Model B: Soil + Terrain,17,-0.0543,0.112,64.379,95.092
+Chromium (Cr),chromium_mg_kg,Model C: Soil + Terr + Clim,22,0.1944,0.1447,53.886,83.524
+Chromium (Cr),chromium_mg_kg,Model D: Soil + Terr + Clim + Sat,27,0.1896,0.0988,54.184,83.508
+Chromium (Cr),chromium_mg_kg,Model E: All Features (Full Master),32,0.1889,0.1312,53.938,83.598
+Lead (Pb),lead_mg_kg,Model A: Soil Only,11,-0.1818,0.0595,18.82,27.316
+Lead (Pb),lead_mg_kg,Model B: Soil + Terrain,17,0.237,0.0323,15.643,22.029
+Lead (Pb),lead_mg_kg,Model C: Soil + Terr + Clim,22,0.3309,0.0711,14.499,20.668
+Lead (Pb),lead_mg_kg,Model D: Soil + Terr + Clim + Sat,27,0.3051,0.0585,14.822,21.021
+Lead (Pb),lead_mg_kg,Model E: All Features (Full Master),32,0.3288,0.0806,14.443,20.694
+Cadmium (Cd),cadmium_mg_kg,Model A: Soil Only,11,-0.2047,0.0305,0.412,0.587
+Cadmium (Cd),cadmium_mg_kg,Model B: Soil + Terrain,17,0.0616,0.0446,0.351,0.519
+Cadmium (Cd),cadmium_mg_kg,Model C: Soil + Terr + Clim,22,0.1079,0.0453,0.337,0.506
+Cadmium (Cd),cadmium_mg_kg,Model D: Soil + Terr + Clim + Sat,27,0.0982,0.0157,0.342,0.508
+Cadmium (Cd),cadmium_mg_kg,Model E: All Features (Full Master),32,0.1074,0.0569,0.339,0.505
+Nickel (Ni),nickel_mg_kg,Model A: Soil Only,11,-0.0523,0.0937,22.818,32.85
+Nickel (Ni),nickel_mg_kg,Model B: Soil + Terrain,17,0.1831,0.0997,19.297,28.677
+Nickel (Ni),nickel_mg_kg,Model C: Soil + Terr + Clim,22,0.2017,0.1509,18.618,28.2
+Nickel (Ni),nickel_mg_kg,Model D: Soil + Terr + Clim + Sat,27,0.1906,0.1191,18.732,28.512
+Nickel (Ni),nickel_mg_kg,Model E: All Features (Full Master),32,0.1521,0.1181,19.178,29.147

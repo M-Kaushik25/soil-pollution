@@ -1,0 +1,5 @@
+target,nominal_confidence_level_pct,empirical_coverage_pct,coverage_gap_pct,conformal_quantile_q_hat,mean_interval_width_mg_kg,median_interval_width_mg_kg,test_r2
+Chromium (Cr),90.0,96.43,6.43,150.64,244.35,245.36,0.2091
+Lead (Pb),90.0,91.96,1.96,36.28,62.99,60.42,0.278
+Cadmium (Cd),90.0,85.71,-4.29,0.54,1.01,1.07,0.2325
+Nickel (Ni),90.0,91.96,1.96,49.23,88.36,88.18,0.1725

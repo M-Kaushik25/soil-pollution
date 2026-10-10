@@ -1,0 +1,36 @@
+feature_name,feature_group,missing_pct,mean,std,min,max,variance,is_constant,is_near_zero_variance,status
+latitude,Anthropogenic / Proximity,0.0,11.763,0.97,10.211,13.5,0.941,False,False,PASSED
+longitude,Anthropogenic / Proximity,0.0,78.672,1.061,76.508,80.3,1.1247,False,False,PASSED
+sampling_year,Anthropogenic / Proximity,0.0,2022.46,0.898,2021.0,2024.0,0.8062,False,False,PASSED
+soil_ph,Soil Properties / SoilGrids,0.0,7.154,0.817,4.8,9.2,0.6677,False,False,PASSED
+soil_ec_dSm,Soil Properties / SoilGrids,0.0,0.7,0.464,0.105,4.5,0.2154,False,False,PASSED
+soc_pct,Soil Properties / SoilGrids,0.0,0.695,0.479,0.15,2.8,0.2293,False,False,PASSED
+clay_pct,Soil Properties / SoilGrids,0.0,27.364,9.366,5.0,54.93,87.7297,False,False,PASSED
+silt_pct,Soil Properties / SoilGrids,0.0,20.535,13.267,3.94,58.93,176.0248,False,False,PASSED
+sand_pct,Soil Properties / SoilGrids,0.0,52.1,10.78,19.84,79.2,116.2091,False,False,PASSED
+elevation_m,Terrain / Topography,0.0,474.427,462.127,19.6,1536.5,213561.6778,False,False,PASSED
+slope_deg,Terrain / Topography,0.0,17.24,14.515,0.51,45.0,210.695,False,False,PASSED
+aspect_sin,Terrain / Topography,0.0,-0.022,0.7,-1.0,1.0,0.4897,False,False,PASSED
+aspect_cos,Terrain / Topography,0.0,0.003,0.716,-1.0,1.0,0.5121,False,False,PASSED
+twi,Terrain / Topography,0.0,9.66,1.154,7.119,13.214,1.3309,False,False,PASSED
+mrvbf,Terrain / Topography,0.0,0.334,0.216,0.0,1.0,0.0466,False,False,PASSED
+bio1_annual_mean_temp_c,Bioclimate,0.0,26.423,3.052,18.62,30.28,9.3118,False,False,PASSED
+bio4_temp_seasonality,Bioclimate,0.0,236.262,16.719,201.7,280.8,279.5273,False,False,PASSED
+bio12_annual_precip_mm,Bioclimate,0.0,970.21,127.985,676.5,1271.4,16380.1537,False,False,PASSED
+bio15_precip_seasonality,Bioclimate,0.0,81.868,7.728,58.8,103.1,59.7283,False,False,PASSED
+aridity_index,Bioclimate,0.0,0.697,0.157,0.493,1.107,0.0245,False,False,PASSED
+sg_clay_5_15cm,Soil Properties / SoilGrids,0.0,273.608,94.154,43.2,556.6,8864.9594,False,False,PASSED
+sg_sand_5_15cm,Soil Properties / SoilGrids,0.0,520.08,109.543,190.6,783.9,11999.7574,False,False,PASSED
+sg_soc_5_15cm,Soil Properties / SoilGrids,0.0,5.802,4.276,-1.7,24.4,18.2837,False,False,PASSED
+sg_cec_topsoil,Soil Properties / SoilGrids,0.0,27.034,5.114,12.75,44.13,26.1536,False,False,PASSED
+sg_bulk_density_g_cm3,Soil Properties / SoilGrids,0.0,1.493,0.056,1.286,1.628,0.0031,False,False,PASSED
+s2_ndvi,Satellite Remote Sensing,0.0,0.444,0.182,0.006,0.879,0.0331,False,False,PASSED
+s2_evi,Satellite Remote Sensing,0.0,0.38,0.166,0.0,0.759,0.0274,False,False,PASSED
+s2_bsi,Satellite Remote Sensing,0.0,0.131,0.117,-0.125,0.435,0.0137,False,False,PASSED
+s2_clay_index,Satellite Remote Sensing,0.0,1.609,0.162,1.128,2.093,0.0262,False,False,PASSED
+s2_iron_oxide_index,Satellite Remote Sensing,0.0,1.408,0.159,0.933,1.91,0.0253,False,False,PASSED
+dist_to_industrial_km,Anthropogenic / Proximity,0.0,43.159,22.186,1.04,139.33,492.2311,False,False,PASSED
+dist_to_major_road_km,Anthropogenic / Proximity,0.0,3.008,3.093,0.11,20.58,9.5686,False,False,PASSED
+dist_to_river_km,Anthropogenic / Proximity,0.0,4.93,4.89,0.2,27.71,23.9121,False,False,PASSED
+pop_density_sqkm,Anthropogenic / Proximity,0.0,885.713,1160.272,61.5,7680.4,1346231.8462,False,False,PASSED
+urban_builtup_fraction,Anthropogenic / Proximity,0.0,0.259,0.24,0.0,0.766,0.0574,False,False,PASSED

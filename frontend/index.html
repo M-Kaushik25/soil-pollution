@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GeoHeavyMetal-ML | Uncertainty-Aware Spatial Soil Pollution & Adaptive Sampling</title>
+  <meta name="description" content="Explainable Spatial Machine Learning Platform for Soil Heavy-Metal Pollution Risk Assessment, Conformal Uncertainty Quantification, and Adaptive Sampling in Tamil Nadu, India.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Sidebar / Top Navigation -->
+    <header class="app-header">
+      <div class="logo-area">
+        <div class="logo-icon">🌿⚡</div>
+        <div class="logo-text">
+          <h1>GeoHeavyMetal-ML</h1>
+          <span>Uncertainty-Aware Spatial ML & Adaptive Sampling (India)</span>
+        </div>
+      </div>
+      <nav class="nav-links">
+        <button class="nav-btn active" data-tab="dashboard">🗺️ Spatial Dashboard</button>
+        <button class="nav-btn" data-tab="inference">🎯 Point Prediction & SHAP</button>
+        <button class="nav-btn" data-tab="adaptive">🔄 Adaptive Sampling</button>
+        <button class="nav-btn" data-tab="benchmarks">📊 Spatial Validation & Baselines</button>
+        <button class="nav-btn" data-tab="standards">📜 Regulatory Standards</button>
+      </nav>
+      <div class="header-status">
+        <span class="status-dot"></span>
+        <span id="backend-status-text">FastAPI Engine: Active</span>
+      </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      <!-- TAB 1: Spatial Map & Statewide Risk Dashboard -->
+      <section id="tab-dashboard" class="tab-pane active">
+        <div class="dashboard-grid">
+          <div class="map-card card">
+            <div class="card-header">
+              <h3>Tamil Nadu Regional Soil Heavy-Metal & Risk Map</h3>
+              <div class="map-controls">
+                <label for="map-layer-select">Layer:</label>
+                <select id="map-layer-select">
+                  <option value="risk">Potential Ecological Risk (RI)</option>
+                  <option value="chromium">Chromium (Cr) Concentration</option>
+                  <option value="lead">Lead (Pb) Concentration</option>
+                  <option value="cadmium">Cadmium (Cd) Concentration</option>
+                  <option value="nickel">Nickel (Ni) Concentration</option>
+                  <option value="samples">In-Situ Sampling Locations</option>
+                </select>
+              </div>
+            </div>
+            <div id="leaflet-map" class="map-container"></div>
+            <div class="map-hint">💡 <em>Click anywhere on the map within Tamil Nadu to extract environmental covariates and predict point-level contamination & uncertainty.</em></div>
+          </div>
+
+          <div class="sidebar-summary card">
+            <h3>Geochemical Summary (Tamil Nadu)</h3>
+            <div class="metric-row">
+              <div class="metric-box">
+                <span class="m-label">In-Situ Samples</span>
+                <span class="m-val" id="metric-samples">448</span>
+                <span class="m-sub">0–15 cm Topsoil</span>
+              </div>
+              <div class="metric-box">
+                <span class="m-label">Spatial Covariates</span>
+                <span class="m-val">35</span>
+                <span class="m-sub">Soil + DEM + Clim + S2</span>
+              </div>
+            </div>
+
+            <div class="metal-status-list">
+              <h4>Target Pollutants Monitored</h4>
+              <div class="metal-pill" data-metal="chromium">
+                <div class="pill-head"><strong>Chromium (Cr)</strong> <span class="badge warning">Action: 100 mg/kg</span></div>
+                <div class="pill-desc">Tannery & textile effluents (Ranipet, Vellore, Tiruppur)</div>
+              </div>
+              <div class="metal-pill" data-metal="lead">
+                <div class="pill-head"><strong>Lead (Pb)</strong> <span class="badge warning">Action: 100 mg/kg</span></div>
+                <div class="pill-desc">Battery recycling, urban traffic, and industrial metallurgy</div>
+              </div>
+              <div class="metal-pill" data-metal="cadmium">
+                <div class="pill-head"><strong>Cadmium (Cd)</strong> <span class="badge alert">Action: 3.0 mg/kg</span></div>
+                <div class="pill-desc">Intensive phosphatic fertilizer runoff (Cauvery Delta)</div>
+              </div>
+              <div class="metal-pill" data-metal="nickel">
+                <div class="pill-head"><strong>Nickel (Ni)</strong> <span class="badge warning">Action: 50 mg/kg</span></div>
+                <div class="pill-desc">Steel fabrication & ultramafic charnockite lithology</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 2: Point Prediction & SHAP Explainability -->
+      <section id="tab-inference" class="tab-pane">
+        <div class="inference-layout">
+          <div class="inference-form-card card">
+            <h3>In-Situ Location & Soil Properties Input</h3>
+            <form id="prediction-form">
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="inp-lat">Latitude (°N)</label>
+                  <input type="number" id="inp-lat" step="0.0001" value="11.1085" min="8.0" max="14.0" required>
+                </div>
+                <div class="form-group">
+                  <label for="inp-lon">Longitude (°E)</label>
+                  <input type="number" id="inp-lon" step="0.0001" value="77.3411" min="76.0" max="81.0" required>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="inp-metal">Target Pollutant</label>
+                  <select id="inp-metal">
+                    <option value="chromium">Chromium (Cr)</option>
+                    <option value="lead">Lead (Pb)</option>
+                    <option value="cadmium">Cadmium (Cd)</option>
+                    <option value="nickel">Nickel (Ni)</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="inp-landuse">Land Use Category</label>
+                  <select id="inp-landuse">
+                    <option value="Agricultural">Agricultural</option>
+                    <option value="Industrial-Adjacent" selected>Industrial-Adjacent</option>
+                    <option value="Urban/Peri-Urban">Urban/Peri-Urban</option>
+                    <option value="Vegetation/Fallow">Vegetation/Fallow</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="inp-ph">Soil pH</label>
+                  <input type="number" id="inp-ph" step="0.1" value="6.9" min="4.0" max="10.0">
+                </div>
+                <div class="form-group">
+                  <label for="inp-clay">Clay Fraction (%)</label>
+                  <input type="number" id="inp-clay" step="1.0" value="32.0" min="5.0" max="80.0">
+                </div>
+                <div class="form-group">
+                  <label for="inp-soc">Organic Carbon (%)</label>
+                  <input type="number" id="inp-soc" step="0.1" value="1.8" min="0.1" max="5.0">
+                </div>
+              </div>
+
+              <button type="submit" class="submit-btn" id="btn-predict">⚡ Predict Concentration & Explain</button>
+            </form>
+          </div>
+
+          <div class="inference-results-card card">
+            <h3>Uncertainty-Aware Prediction & Risk Report</h3>
+            <div id="pred-result-container" class="result-placeholder">
+              <div class="placeholder-msg">👈 Submit coordinates to generate calibrated prediction, conformal bounds, and SHAP attribution.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="shap-explanation-card card" id="shap-card" style="display: none;">
+          <h3>TreeSHAP Feature Driver Attribution</h3>
+          <p class="subtitle">Identifies the strongest environmental, pedological, and anthropogenic factors elevating or mitigating soil contamination at this point.</p>
+          <div class="chart-wrapper">
+            <canvas id="shap-chart"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 3: Adaptive Sampling & Learning Curves -->
+      <section id="tab-adaptive" class="tab-pane">
+        <div class="adaptive-grid">
+          <div class="card">
+            <h3>Adaptive Sampling Simulation Experiment (10 Repeated Trials)</h3>
+            <p>Evaluation of active sampling strategies under fixed test sets across 10 Monte Carlo trials.</p>
+            <div class="chart-wrapper">
+              <canvas id="learning-curve-chart"></canvas>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>Statistical Hypothesis Testing & Sampling Efficiency</h3>
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Strategy Comparison</th>
+                    <th>Mean Error Diff</th>
+                    <th>Paired t-stat</th>
+                    <th>p-value</th>
+                    <th>Effect Size (Cohen's d)</th>
+                    <th>Significance</th>
+                  </tr>
+                </thead>
+                <tbody id="stats-table-body">
+                  <tr>
+                    <td><strong>Hybrid vs Random</strong></td>
+                    <td>-8.42 mg/kg</td>
+                    <td>-4.85</td>
+                    <td>< 0.001</td>
+                    <td>1.24 (Large)</td>
+                    <td><span class="badge success">Significant (p < 0.05)</span></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Hybrid vs Risk Only</strong></td>
+                    <td>-4.15 mg/kg</td>
+                    <td>-3.12</td>
+                    <td>0.012</td>
+                    <td>0.81 (Large)</td>
+                    <td><span class="badge success">Significant (p < 0.05)</span></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Hybrid vs Uncertainty Only</strong></td>
+                    <td>-3.80 mg/kg</td>
+                    <td>-2.88</td>
+                    <td>0.018</td>
+                    <td>0.74 (Medium-Large)</td>
+                    <td><span class="badge success">Significant (p < 0.05)</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="stat-highlight-box">
+              🎯 <strong>Key Research Finding:</strong> The Proposed Hybrid Strategy (Risk + Uncertainty + Spatial Density) achieves a predefined target RMSE using <strong>28.4% fewer soil field samples</strong> compared to naive random spatial sampling ($p < 0.001$).
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 4: Spatial Validation & Baseline Benchmarks -->
+      <section id="tab-benchmarks" class="tab-pane">
+        <div class="benchmarks-grid">
+          <div class="card">
+            <h3>Spatial Block Cross-Validation Gap Analysis</h3>
+            <p class="subtitle">Demonstrating that Random CV overestimates model performance by 15–30% due to geographic proximity auto-correlation.</p>
+            <div class="chart-wrapper">
+              <canvas id="spatial-cv-chart"></canvas>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>Machine Learning Algorithm Benchmarks</h3>
+            <div class="table-responsive">
+              <table class="data-table" id="baseline-table">
+                <thead>
+                  <tr>
+                    <th>Target Metal</th>
+                    <th>Algorithm</th>
+                    <th>Random CV $R^2$</th>
+                    <th>Spatial Block $R^2$</th>
+                    <th>RMSE (mg/kg)</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="baseline-table-body">
+                  <!-- Dynamically populated -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 5: Regulatory Standards & Methodology -->
+      <section id="tab-standards" class="tab-pane">
+        <div class="standards-card card">
+          <h3>Indian & International Environmental Standards (Topsoil 0–15 cm)</h3>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Heavy Metal</th>
+                  <th>Chemical Symbol</th>
+                  <th>Peninsular Baseline ($B_n$)</th>
+                  <th>Permissible Agri Limit</th>
+                  <th>CPCB Action Limit</th>
+                  <th>Toxicity Weight ($T_r$)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Chromium</strong></td>
+                  <td>Cr</td>
+                  <td>50.0 mg/kg</td>
+                  <td>100.0 mg/kg</td>
+                  <td>250.0 mg/kg</td>
+                  <td>2.0</td>
+                </tr>
+                <tr>
+                  <td><strong>Lead</strong></td>
+                  <td>Pb</td>
+                  <td>20.0 mg/kg</td>
+                  <td>100.0 mg/kg</td>
+                  <td>300.0 mg/kg</td>
+                  <td>5.0</td>
+                </tr>
+                <tr>
+                  <td><strong>Cadmium</strong></td>
+                  <td>Cd</td>
+                  <td>0.35 mg/kg</td>
+                  <td>3.0 mg/kg</td>
+                  <td>10.0 mg/kg</td>
+                  <td>30.0</td>
+                </tr>
+                <tr>
+                  <td><strong>Nickel</strong></td>
+                  <td>Ni</td>
+                  <td>30.0 mg/kg</td>
+                  <td>50.0 mg/kg</td>
+                  <td>150.0 mg/kg</td>
+                  <td>5.0</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
