@@ -502,6 +502,25 @@ function renderPredictionResults(pred, expl) {
   document.getElementById('results-placeholder').classList.add('hidden');
   document.getElementById('results-display').classList.remove('hidden');
 
+  // 1. Farmer-Friendly Advisory Block
+  if (pred.farmer_advisory) {
+    const adv = pred.farmer_advisory;
+    const pill = document.getElementById('farmer-verdict-pill');
+    pill.className = `farmer-status-pill ${adv.badge_class || 'safe'}`;
+    pill.textContent = adv.verdict;
+
+    document.getElementById('farmer-summary-text').textContent = adv.summary;
+
+    const stepsList = document.getElementById('farmer-steps-list');
+    stepsList.innerHTML = (adv.advice_steps || []).map(step => `<li>${step}</li>`).join('');
+
+    const cropNote = document.getElementById('farmer-crop-note');
+    if (adv.crop_health_note) {
+      cropNote.innerHTML = `<strong>🌾 Crop & Health Insight:</strong> ${adv.crop_health_note}`;
+    }
+  }
+
+  // 2. Technical Figures & Hero Banner
   document.getElementById('res-target-sub').textContent = `TARGET: ${pred.metal.toUpperCase()} (${pred.symbol})`;
   document.getElementById('res-pred-val').textContent = pred.predicted_concentration_mg_kg.toFixed(2);
   

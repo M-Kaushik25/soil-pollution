@@ -512,6 +512,104 @@ body {
 
 .ph-icon { font-size: 40px; margin-bottom: 8px; }
 
+/* Farmer Advisory Card */
+.farmer-card {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.12), rgba(19, 27, 43, 0.95));
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+  margin-bottom: 16px;
+}
+
+.farmer-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: 12px;
+  margin-bottom: 12px;
+}
+
+.farmer-title-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.farmer-icon {
+  font-size: 26px;
+}
+
+.farmer-subtitle {
+  font-size: 11.5px;
+  color: var(--text-muted);
+}
+
+.farmer-status-pill {
+  font-family: var(--font-heading);
+  font-size: 12px;
+  font-weight: 700;
+  padding: 5px 12px;
+  border-radius: 20px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.farmer-status-pill.safe {
+  background: rgba(16, 185, 129, 0.2);
+  color: #34d399;
+  border: 1px solid #10b981;
+}
+
+.farmer-status-pill.warn {
+  background: rgba(245, 158, 11, 0.2);
+  color: #fbbf24;
+  border: 1px solid #f59e0b;
+}
+
+.farmer-status-pill.danger {
+  background: rgba(244, 63, 94, 0.2);
+  color: #f87171;
+  border: 1px solid #f43f5e;
+}
+
+.farmer-summary-text {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #f8fafc;
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+
+.farmer-actions-title {
+  font-size: 11.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--accent-cyan);
+  letter-spacing: 0.05em;
+  margin-bottom: 6px;
+}
+
+.farmer-steps-list {
+  padding-left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 12.5px;
+  color: #cbd5e1;
+  margin-bottom: 12px;
+}
+
+.farmer-crop-note {
+  font-size: 11.5px;
+  color: var(--text-muted);
+  background: rgba(0, 0, 0, 0.25);
+  border-left: 3px solid var(--accent-cyan);
+  padding: 8px 12px;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+
 .result-hero-card {
   background: linear-gradient(135deg, rgba(19, 27, 43, 0.95), rgba(16, 185, 129, 0.08));
   border: 1px solid rgba(16, 185, 129, 0.3);
