@@ -92,7 +92,12 @@
         </div>
 
         <div class="map-container-box card">
-          <div id="leaflet-map" class="map-canvas"></div>
+          <div id="leaflet-map" class="map-canvas" style="min-height: 480px; width: 100%;">
+            <div id="map-fallback-msg" class="map-fallback-notice" style="display:none; padding:30px; text-align:center; color:#e2e8f0;">
+              <h3>Map Initialization Notice</h3>
+              <p>Leaflet map library or geospatial tiles are currently loading or unavailable.</p>
+            </div>
+          </div>
           <div id="map-loader" class="map-loader hidden">
             <div class="spinner"></div>
             <span>Loading Geospatial Layer...</span>
@@ -431,6 +436,7 @@
     </main>
   </div>
 
-  <script type="module" src="app.js"></script>
+  <script src="api.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>

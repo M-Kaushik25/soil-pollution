@@ -4,7 +4,23 @@
  * conformal uncertainty bounds, tree attribution charts, and report exports.
  */
 
-import { api } from './api.js';
+(function() {
+  'use strict';
+
+  // Fallback-safe API reference (works in classic script and module environments)
+  const api = window.api || {
+  getBaseUrl() { return "http://127.0.0.1:8000"; },
+  async checkHealth() { return { status: "offline", total_models: 0 }; },
+  async getMetals() { return { metals: {} }; },
+  async getInSituSamples() { return { samples: [] }; },
+  async getPollutionMap() { return { grid_data: [] }; },
+  async predictSoil() { throw new Error("FastAPI engine is offline"); },
+  async getExplanation() { throw new Error("FastAPI engine is offline"); },
+  async getSamplingPriority() { throw new Error("FastAPI engine is offline"); },
+  async getSamplingRecommendations() { return { top_recommendations: [] }; },
+  async getModelPerformance() { return { models: {} }; },
+  async generateReport() { throw new Error("FastAPI engine is offline"); }
+};
 
 // Application State
 const state = {
@@ -31,16 +47,51 @@ let gridLayer = null;
 let recsLayer = null;
 let userPinLayer = null;
 
+// Safe Ready-State Runner
+function runWhenReady(fn) {
+  if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    fn();
+  } else {
+    document.addEventListener('DOMContentLoaded', fn);
+  }
+}
+
 // Initialize on DOM Ready
-document.addEventListener('DOMContentLoaded', async () => {
+runWhenReady(() => {
   initNavigation();
   initFormInteractions();
   initReportActions();
-  await checkHealth();
+
+  // Initialize map first and synchronously so UI map renders immediately
   initLeafletMap();
-  loadProvenanceAndBenchmarks();
-  loadAdaptiveSampling();
+
+  // Window resize handler for responsive Leaflet rendering
+  window.addEventListener('resize', () => {
+    if (map && state.activeTab === 'map') {
+      map.invalidateSize();
+    }
+  });
+
+  // Asynchronously query backend status and metrics without blocking map UI
+  checkHealth().finally(() => {
+    loadProvenanceAndBenchmarks();
+    loadAdaptiveSampling();
+  });
 });
+
+// Helper for tile error warning banner
+function showMapTileWarning(msg) {
+  let warn = document.getElementById('map-tile-warning');
+  if (!warn) {
+    warn = document.createElement('div');
+    warn.id = 'map-tile-warning';
+    warn.className = 'map-tile-warning';
+    const container = document.querySelector('.map-container-box') || document.body;
+    container.appendChild(warn);
+  }
+  warn.textContent = msg;
+  warn.style.display = 'block';
+}
 
 // ---------------------------------------------------------------------------
 // 1. Navigation & Tabs
@@ -65,7 +116,10 @@ function switchTab(tabId) {
   });
 
   if (tabId === 'map' && map) {
-    setTimeout(() => map.invalidateSize(), 150);
+    map.invalidateSize();
+    setTimeout(() => {
+      if (map) map.invalidateSize();
+    }, 150);
   }
 }
 
@@ -81,18 +135,21 @@ async function checkHealth() {
     if (health.status === 'healthy') {
       healthDot.className = 'status-dot active';
       healthText.textContent = `FastAPI: Active (${health.total_models} Models Ready)`;
+    } else {
+      healthDot.className = 'status-dot error';
+      healthText.textContent = 'FastAPI: Offline';
     }
   } catch (err) {
     healthDot.className = 'status-dot error';
     healthText.textContent = 'FastAPI: Offline';
-    console.error('Health check failed:', err);
+    console.warn('Health check notice (Backend offline):', err.message || err);
   }
 
   try {
     const metalsData = await api.getMetals();
     state.metals = metalsData.metals || {};
   } catch (err) {
-    console.error('Failed to load metals:', err);
+    console.warn('Metals metadata notice:', err.message || err);
   }
 }
 
@@ -100,46 +157,100 @@ async function checkHealth() {
 // 3. Leaflet Geospatial Mapping
 // ---------------------------------------------------------------------------
 function initLeafletMap() {
-  // Center on Tamil Nadu (lat 11.12, lon 78.65)
-  map = L.map('leaflet-map', {
-    center: [11.1271, 78.6569],
-    zoom: 7,
-    minZoom: 6,
-    maxZoom: 16
-  });
+  const mapContainer = document.getElementById('leaflet-map');
+  if (!mapContainer) return;
 
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-    attribution: '&copy; OpenStreetMap &copy; CARTO',
-    subdomains: 'abcd',
-    maxZoom: 19
-  }).addTo(map);
+  // Prevent duplicate initialization
+  if (map || mapContainer._leaflet_id) {
+    return;
+  }
 
-  markersLayer = L.layerGroup().addTo(map);
-  gridLayer = L.layerGroup().addTo(map);
-  recsLayer = L.layerGroup().addTo(map);
-  userPinLayer = L.layerGroup().addTo(map);
+  // Check if Leaflet library is loaded
+  if (typeof window.L === 'undefined') {
+    console.error('Leaflet library (window.L) is not loaded.');
+    const fallbackMsg = document.getElementById('map-fallback-msg');
+    if (fallbackMsg) {
+      fallbackMsg.style.display = 'block';
+      fallbackMsg.innerHTML = '<h3>Map Engine Notice</h3><p>The Leaflet mapping library could not be loaded from CDN. Please verify your internet connection.</p>';
+    }
+    return;
+  }
 
-  // Map Click Handler
-  map.on('click', (e) => {
-    const lat = parseFloat(e.latlng.lat.toFixed(4));
-    const lon = parseFloat(e.latlng.lng.toFixed(4));
+  try {
+    // Center on Tamil Nadu (lat 11.1271, lon 78.6569) with default zoom 7
+    map = L.map('leaflet-map', {
+      center: [11.1271, 78.6569],
+      zoom: 7,
+      minZoom: 6,
+      maxZoom: 16
+    });
 
-    if (lat < 8.0 || lat > 14.0 || lon < 76.0 || lon > 81.0) {
-      alert('Selected location is outside the Tamil Nadu study region (8.0°N–14.0°N, 76.0°E–81.0°E).');
-      return;
+    // Primary Carto voyager tile layer
+    const primaryTiles = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
+      subdomains: 'abcd',
+      maxZoom: 19
+    });
+
+    let tileErrorCount = 0;
+    primaryTiles.on('tileerror', () => {
+      tileErrorCount++;
+      if (tileErrorCount === 3) {
+        console.warn('Carto tile layer experiencing errors; switching to OpenStreetMap fallback.');
+        map.removeLayer(primaryTiles);
+        const osmFallback = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '&copy; OpenStreetMap contributors',
+          maxZoom: 19
+        }).addTo(map);
+        osmFallback.on('tileerror', () => {
+          showMapTileWarning('Tile network unreachable (offline). Coordinate picking and form analysis remain active.');
+        });
+      }
+    });
+
+    primaryTiles.addTo(map);
+
+    markersLayer = L.layerGroup().addTo(map);
+    gridLayer = L.layerGroup().addTo(map);
+    recsLayer = L.layerGroup().addTo(map);
+    userPinLayer = L.layerGroup().addTo(map);
+
+    // Map Click Handler
+    map.on('click', (e) => {
+      const lat = parseFloat(e.latlng.lat.toFixed(4));
+      const lon = parseFloat(e.latlng.lng.toFixed(4));
+
+      if (lat < 8.0 || lat > 14.0 || lon < 76.0 || lon > 81.0) {
+        alert('Selected location is outside the Tamil Nadu study region (8.0°N–14.0°N, 76.0°E–81.0°E).');
+        return;
+      }
+
+      setUserPin(lat, lon, 'Selected Coordinates');
+    });
+
+    // Layer Select Change
+    const layerSelect = document.getElementById('map-layer-select');
+    if (layerSelect) {
+      layerSelect.addEventListener('change', () => {
+        renderActiveMapLayer(layerSelect.value);
+      });
     }
 
-    setUserPin(lat, lon, 'Selected Coordinates');
-  });
+    // Force dimension invalidation after initial layout pass
+    setTimeout(() => {
+      if (map) map.invalidateSize();
+    }, 150);
 
-  // Layer Select Change
-  const layerSelect = document.getElementById('map-layer-select');
-  layerSelect.addEventListener('change', () => {
-    renderActiveMapLayer(layerSelect.value);
-  });
-
-  // Initial layer render
-  renderActiveMapLayer('samples');
+    // Initial layer render
+    renderActiveMapLayer('samples');
+  } catch (err) {
+    console.error('Failed to initialize Leaflet map:', err);
+    const fallbackMsg = document.getElementById('map-fallback-msg');
+    if (fallbackMsg) {
+      fallbackMsg.style.display = 'block';
+      fallbackMsg.innerHTML = `<h3>Map Initialization Error</h3><p>${err.message}</p>`;
+    }
+  }
 }
 
 function setUserPin(lat, lon, label = 'Selected Site') {
@@ -302,7 +413,8 @@ async function renderActiveMapLayer(layerType) {
       });
     }
   } catch (err) {
-    statusText.textContent = `Error: ${err.message}`;
+    console.warn('Map layer data fetch notice (backend offline or unavailable):', err.message || err);
+    statusText.textContent = 'Base Map Active (Backend data offline — click anywhere on map to select coordinates)';
   } finally {
     loader.classList.add('hidden');
   }
@@ -907,3 +1019,4 @@ function initReportActions() {
     URL.revokeObjectURL(url);
   });
 }
+})();

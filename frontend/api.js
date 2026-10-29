@@ -4,9 +4,12 @@
  * Never returns fake fallback data; surfaces genuine API errors.
  */
 
-const API_BASE = window.location.origin.includes(":8000") 
-  ? window.location.origin 
-  : "http://127.0.0.1:8000";
+(function() {
+  'use strict';
+
+  const API_BASE = window.location.origin.includes(":8000") 
+    ? window.location.origin 
+    : "http://127.0.0.1:8000";
 
 async function fetchJson(endpoint, options = {}) {
   const url = `${API_BASE}${endpoint}`;
@@ -41,7 +44,7 @@ async function fetchJson(endpoint, options = {}) {
   }
 }
 
-export const api = {
+const api = {
   getBaseUrl() {
     return API_BASE;
   },
@@ -106,4 +109,14 @@ export const api = {
     });
   }
 };
+
+  // Global export for script-tag loading (avoids file:// CORS module blockage)
+  if (typeof window !== "undefined") {
+    window.api = api;
+  }
+
+  if (typeof module !== "undefined" && module.exports) {
+    module.exports = { api };
+  }
+})();
 
