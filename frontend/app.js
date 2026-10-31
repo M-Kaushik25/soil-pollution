@@ -177,6 +177,11 @@ function initLeafletMap() {
   }
 
   try {
+    // Configure local assets path for Leaflet markers
+    if (L.Icon && L.Icon.Default) {
+      L.Icon.Default.imagePath = 'leaflet/images/';
+    }
+
     // Center on Tamil Nadu (lat 11.1271, lon 78.6569) with default zoom 7
     map = L.map('leaflet-map', {
       center: [11.1271, 78.6569],
