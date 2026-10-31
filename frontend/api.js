@@ -17,6 +17,7 @@ async function fetchJson(endpoint, options = {}) {
     const res = await fetch(url, {
       ...options,
       headers: {
+        "Accept": "application/json",
         "Content-Type": "application/json",
         ...(options.headers || {})
       }
@@ -54,7 +55,7 @@ const api = {
   },
 
   async getManifest() {
-    return fetchJson("/");
+    return fetchJson("/manifest");
   },
 
   async getMetals() {

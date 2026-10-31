@@ -12,7 +12,8 @@ import numpy as np
 import pandas as pd
 from datetime import datetime, timezone
 from typing import List, Optional, Dict, Any
-from fastapi import FastAPI, HTTPException, Query, status
+from fastapi import FastAPI, HTTPException, Query, status, Request
+from fastapi.responses import JSONResponse, RedirectResponse, FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field, model_validator
 
@@ -224,9 +225,9 @@ def extract_features_for_input(loc: LocationInput) -> pd.DataFrame:
 # Core API Endpoints
 # ---------------------------------------------------------------------------
 @app.get("/")
-def root():
-    """Service manifest and active status."""
-    return {
+def root(request: Request = None):
+    """Service manifest and active status. Redirects browsers to interactive dashboard."""
+    manifest_data = {
         "app_name": "GeoSoil Insight — Tamil Nadu Soil Pollution Explorer",
         "version": "2.0.0",
         "status": "active",
@@ -236,6 +237,17 @@ def root():
         "available_targets": list(METAL_INFO.keys()),
         "provenance_note": "Research prototype built upon a parameter-calibrated synthetic Tamil Nadu benchmark dataset with spatial cross-validation and split-conformal uncertainty quantification."
     }
+    if request is not None:
+        accept = request.headers.get("accept", "")
+        if "application/json" in accept and "text/html" not in accept:
+            return JSONResponse(content=manifest_data)
+        return RedirectResponse(url="/dashboard/", status_code=302)
+    return manifest_data
+
+@app.get("/manifest")
+def manifest():
+    """Explicit JSON service manifest endpoint."""
+    return root(request=None)
 
 @app.get("/health")
 def health_check():
@@ -703,18 +715,36 @@ def generate_analysis_report(req: ReportRequest):
     return report_dict
 
 # ---------------------------------------------------------------------------
-# Static Frontend Mounts
+# Static Frontend Mounts & Browser Navigation Routes
 # ---------------------------------------------------------------------------
 FRONTEND_DIR = os.path.join(BASE_DIR, "frontend")
 if os.path.exists(FRONTEND_DIR):
     from fastapi.staticfiles import StaticFiles
-    from fastapi.responses import FileResponse
 
     @app.get("/app")
     def serve_frontend_app():
         return FileResponse(os.path.join(FRONTEND_DIR, "index.html"))
 
+    @app.get("/index.html")
+    def serve_index_html():
+        return FileResponse(os.path.join(FRONTEND_DIR, "index.html"))
+
+    @app.get("/map")
+    def serve_map():
+        return RedirectResponse(url="/dashboard/", status_code=302)
+
     app.mount("/dashboard", StaticFiles(directory=FRONTEND_DIR, html=True), name="dashboard")
+    app.mount("/frontend", StaticFiles(directory=FRONTEND_DIR, html=True), name="frontend")
+
+@app.exception_handler(404)
+async def custom_404_handler(request: Request, exc):
+    """Graceful 404 handler: redirects browser navigation to the dashboard instead of showing raw JSON error."""
+    accept = request.headers.get("accept", "")
+    if "text/html" in accept or "*/*" in accept:
+        api_prefixes = ("/predict", "/explanation", "/sampling", "/report", "/metals", "/samples", "/health", "/docs", "/openapi.json")
+        if not any(request.url.path.startswith(p) for p in api_prefixes):
+            return RedirectResponse(url="/dashboard/", status_code=302)
+    return JSONResponse(status_code=404, content={"detail": "Not Found"})
 
 if __name__ == "__main__":
     import uvicorn
