@@ -190,8 +190,8 @@ function initLeafletMap() {
       maxZoom: 16
     });
 
-    // Primary Carto voyager tile layer
-    const primaryTiles = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+    // Primary Carto voyager tile layer with authorized API key
+    const primaryTiles = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png?key=cb1_4ywx_1_0d9d5716edf29dd730b6f8e2', {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
       subdomains: 'abcd',
       maxZoom: 19
