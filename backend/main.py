@@ -1534,7 +1534,7 @@ if os.path.exists(FRONTEND_DIR):
 
     @app.get("/favicon.ico")
     def serve_favicon():
-        return JSONResponse(status_code=204, content={})
+        return Response(status_code=204)
 
     app.mount("/dashboard", StaticFiles(directory=FRONTEND_DIR, html=True), name="dashboard")
     app.mount("/frontend", StaticFiles(directory=FRONTEND_DIR, html=True), name="frontend")
