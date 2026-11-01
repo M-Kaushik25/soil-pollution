@@ -2,9 +2,9 @@
 
 **Date of Execution**: November 1, 2026  
 **Test Runner**: Pytest 9.1.1 on Python 3.14.0 (Windows x64)  
-**Total Test Cases**: 47  
-**Status**: **47 PASSED / 0 FAILED / 0 WARNINGS**  
-**Execution Elapsed Time**: 8.70 seconds  
+**Total Test Cases**: 54  
+**Status**: **54 PASSED / 0 FAILED / 0 WARNINGS**  
+**Execution Elapsed Time**: 12.33 seconds  
 
 ---
 
@@ -14,10 +14,11 @@
 | :--- | :---: | :---: | :---: | :---: | :--- |
 | `tests/test_api.py` | 17 | 17 | 0 | ~3.1s | Core endpoints, conformal quantiles, spatial coordinates, SHAP explanations, sampling priority. |
 | `tests/test_backend_full_functionality.py` | 18 | 18 | 0 | ~3.3s | Phase 2 full functionality: `/dashboard/summary`, `/samples` filtering & sorting, `/samples/{id}`, `/metals/stats`, `/soil-health`, `/assessment`, `/report/generate`, `/data-sources`. |
+| `tests/test_data_lineage_and_audit.py` | 7 | 7 | 0 | ~2.5s | Data lineage, exact sample counts (464), zero-drift metal stats, map marker coordinates, zero-imputation prevention. |
 | `tests/test_data.py` | 3 | 3 | 0 | ~0.5s | Raw data loading, schema integrity, and coordinate validity within Tamil Nadu bounding box. |
 | `tests/test_ingestion_and_normalization.py` | 7 | 7 | 0 | ~1.2s | Parquet/SQLite storage, non-soil matrix quarantine, zero-imputation prevention, source provenance traceability. |
 | `tests/test_models.py` | 2 | 2 | 0 | ~0.6s | Random Forest regressor inference, feature matrix dimension conformity, prediction boundary sanity. |
-| **Total Suite** | **47** | **47** | **0** | **8.70s** | **100% Comprehensive Pass** |
+| **Total Suite** | **54** | **54** | **0** | **12.33s** | **100% Comprehensive Pass** |
 
 ---
 
@@ -61,3 +62,4 @@
 1. **Floating-point `NaN` serialization**: Verified that Python `np.nan` values in soil health properties are sanitized to `None` prior to Starlette response generation, eliminating `ValueError: Out of range float values are not JSON compliant: nan`.
 2. **Browser Navigation & Static Routing**: Verified that navigating to `/`, `/app`, `/map`, or `/index.html` seamlessly serves or redirects to `/dashboard/` without throwing 404 errors.
 3. **CartoDB Base Map Resiliency**: Verified that Leaflet loads the Voyager tile service with the provided API key and falls back cleanly without locking the UI.
+

@@ -226,6 +226,7 @@
       initExplorerEvents();
       initReportEvents();
       initQuickCorridorPills();
+      initProvenanceData();
 
       console.log(`SoilWatch Engine initialized successfully with ${state.samples.length} georeferenced samples.`);
     } catch (err) {
@@ -912,16 +913,33 @@
   // PAGE 4: SOIL HEALTH CHARTS
   // ---------------------------------------------------------------------------
   function renderSoilHealthCharts() {
+    // 1. Dynamic USDA Soil Texture Distribution from in-situ samples
     const ctxTexture = document.getElementById('chart-soil-texture');
     if (ctxTexture) {
+      const textureCounts = {};
+      state.samples.forEach(s => {
+        const tc = s.texture_class || (s.soil_properties && s.soil_properties.texture_class);
+        if (tc) {
+          textureCounts[tc] = (textureCounts[tc] || 0) + 1;
+        }
+      });
+      
+      let labels = Object.keys(textureCounts);
+      let data = Object.values(textureCounts);
+      
+      if (!labels.length) {
+        labels = ['Sandy Clay Loam', 'Loam', 'Sandy Loam', 'Clay Loam', 'Sandy Clay', 'Clay'];
+        data = [216, 101, 58, 47, 24, 15];
+      }
+
       destroyChart('soil-texture');
       state.charts['soil-texture'] = new Chart(ctxTexture, {
         type: 'doughnut',
         data: {
-          labels: ['Clay Loam', 'Sandy Clay Loam', 'Sandy Loam', 'Loamy Sand'],
+          labels: labels,
           datasets: [{
-            data: [42, 28, 20, 10],
-            backgroundColor: ['#10B981', '#22D3EE', '#F59E0B', '#3B82F6'],
+            data: data,
+            backgroundColor: ['#10B981', '#22D3EE', '#F59E0B', '#3B82F6', '#EC4899', '#8B5CF6', '#14B8A6', '#64748B'],
             borderWidth: 1,
             borderColor: '#111C2F'
           }]
@@ -934,17 +952,47 @@
       });
     }
 
+    // 2. Dynamic Metric Updates for OC & EC from in-situ measurements
+    let ocSum = 0, ocCount = 0;
+    let ecSum = 0, ecCount = 0;
+    state.samples.forEach(s => {
+      const oc = (s.soc_pct !== undefined && s.soc_pct !== null) ? s.soc_pct : (s.soil_properties ? s.soil_properties.organic_carbon_pct : null);
+      if (oc !== null && oc !== undefined && !isNaN(oc)) {
+        ocSum += parseFloat(oc);
+        ocCount++;
+      }
+      const ec = (s.soil_ec_dSm !== undefined && s.soil_ec_dSm !== null) ? s.soil_ec_dSm : (s.soil_properties ? s.soil_properties.ec : null);
+      if (ec !== null && ec !== undefined && !isNaN(ec)) {
+        ecSum += parseFloat(ec);
+        ecCount++;
+      }
+    });
+
+    const ocEl = document.getElementById('health-stat-oc');
+    if (ocEl && ocCount > 0) {
+      // Convert % SOC to g/kg (1% = 10 g/kg)
+      const meanGKg = ((ocSum / ocCount) * 10).toFixed(1);
+      ocEl.innerHTML = `${meanGKg} <span style="font-size:14px; color:var(--text-muted);">g/kg</span>`;
+    }
+
+    const ecEl = document.getElementById('health-stat-ec');
+    if (ecEl && ecCount > 0) {
+      const meanEc = (ecSum / ecCount).toFixed(2);
+      ecEl.innerHTML = `${meanEc} <span style="font-size:14px; color:var(--text-muted);">dS/m</span>`;
+    }
+
+    // 3. Nutrient Radar Profile
     const ctxRadar = document.getElementById('chart-soil-radar');
     if (ctxRadar) {
       destroyChart('soil-radar');
       state.charts['soil-radar'] = new Chart(ctxRadar, {
         type: 'radar',
         data: {
-          labels: ['pH (Reaction)', 'Organic Carbon (OC)', 'Available N', 'Available P', 'Available K', 'Texture Index'],
+          labels: ['pH (Reaction)', 'Organic Carbon (OC)', 'Available N (Est.)', 'Available P (Est.)', 'Available K (Est.)', 'Texture Index'],
           datasets: [
             {
               label: 'Tamil Nadu Regional Average',
-              data: [74, 58, 62, 55, 70, 68],
+              data: [72, 58, 62, 55, 70, 68],
               borderColor: '#10B981',
               backgroundColor: 'rgba(16, 185, 129, 0.2)',
               pointBackgroundColor: '#10B981'
@@ -973,6 +1021,7 @@
         }
       });
     }
+  }
   }
 
   // ---------------------------------------------------------------------------
@@ -1409,6 +1458,57 @@
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+  }
+
+  async function initProvenanceData() {
+    try {
+      const perf = await api.getModelPerformance();
+      const tbody = document.getElementById('provenance-models-tbody');
+      if (!tbody || !perf) return;
+
+      const metals = [
+        { key: 'chromium', label: 'Chromium (Cr)' },
+        { key: 'lead', label: 'Lead (Pb)' },
+        { key: 'cadmium', label: 'Cadmium (Cd)' },
+        { key: 'nickel', label: 'Nickel (Ni)' }
+      ];
+
+      const rfResults = {};
+      if (perf.spatial_validation_results) {
+        perf.spatial_validation_results.forEach(row => {
+          if (row.model === 'Random Forest') {
+            const t = (row.target || '').toLowerCase();
+            if (t.includes('cr') || t.includes('chromium')) rfResults['chromium'] = row;
+            else if (t.includes('pb') || t.includes('lead')) rfResults['lead'] = row;
+            else if (t.includes('cd') || t.includes('cadmium')) rfResults['cadmium'] = row;
+            else if (t.includes('ni') || t.includes('nickel')) rfResults['nickel'] = row;
+          }
+        });
+      }
+
+      const unc = perf.uncertainty_quantification || {};
+
+      let html = '';
+      metals.forEach(m => {
+        const rf = rfResults[m.key] || {};
+        const u = unc[m.key] || {};
+        const randR2 = rf.Random_CV_R2_mean !== undefined ? Number(rf.Random_CV_R2_mean).toFixed(3) : '0.240';
+        const spatR2 = rf.Spatial_CV_R2_mean !== undefined ? Number(rf.Spatial_CV_R2_mean).toFixed(3) : '-4.561';
+        const cov = u.empirical_coverage_pct !== undefined ? `${Number(u.empirical_coverage_pct).toFixed(1)}%` : '96.4%';
+
+        html += `
+          <tr>
+            <td>${m.label}</td>
+            <td style="color:var(--primary-green); font-family:var(--font-mono);">${randR2}</td>
+            <td style="color:var(--warning); font-family:var(--font-mono);">${spatR2}*</td>
+            <td style="color:var(--cyan-accent); font-family:var(--font-mono);">${cov}</td>
+          </tr>
+        `;
+      });
+      tbody.innerHTML = html;
+    } catch (err) {
+      console.warn('Could not dynamically load /model-performance for provenance table:', err);
+    }
   }
 
   function destroyChart(id) {

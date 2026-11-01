@@ -908,6 +908,25 @@ def get_in_situ_samples(
                 "zinc_mg_kg": sanitize_nan(m_dict.get("zinc")),
                 "copper_mg_kg": sanitize_nan(m_dict.get("copper")),
                 "arsenic_mg_kg": sanitize_nan(m_dict.get("arsenic")),
+                # Dictionary mappings for nested frontend consumers
+                "heavy_metals": {
+                    "chromium": sanitize_nan(m_dict.get("chromium")),
+                    "lead": sanitize_nan(m_dict.get("lead")),
+                    "cadmium": sanitize_nan(m_dict.get("cadmium")),
+                    "nickel": sanitize_nan(m_dict.get("nickel")),
+                    "zinc": sanitize_nan(m_dict.get("zinc")),
+                    "copper": sanitize_nan(m_dict.get("copper")),
+                    "arsenic": sanitize_nan(m_dict.get("arsenic"))
+                },
+                "soil_properties": {
+                    "ph": sanitize_nan(h_info.get("soil_ph")),
+                    "ec": sanitize_nan(h_info.get("soil_ec_dSm")),
+                    "organic_carbon_pct": sanitize_nan(h_info.get("soc_pct")),
+                    "clay_pct": sanitize_nan(h_info.get("clay_pct")),
+                    "sand_pct": sanitize_nan(h_info.get("sand_pct")),
+                    "silt_pct": sanitize_nan(h_info.get("silt_pct")),
+                    "texture_class": h_info.get("texture_class", "Loam")
+                },
                 "source_name": src_info.get("source_name", "Tamil Nadu Geochemical Survey"),
                 "source_url": src_info.get("source_url", "https://github.com/M-Kaushik25/soil-pollution"),
                 "analytical_method": src_info.get("analytical_protocol", "EPA 3050B + ICP-MS"),

@@ -162,3 +162,4 @@ erDiagram
 | `raw_matrix` | `VARCHAR(64)` | Rejected matrix: `Industrial Effluent`, `River Sediment`, `Foliar Tissue`, `Groundwater`. |
 | `quarantine_reason` | `VARCHAR(255)`| Cause of exclusion: `Non-soil matrix`, `Invalid coordinates out of TN bounds`, `Dry weight not reported`. |
 | `source_id` | `VARCHAR(64)` | Originating dataset source ID. |
+
