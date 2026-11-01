@@ -3,478 +3,1119 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GeoSoil Insight — Tamil Nadu Soil Pollution Explorer</title>
-  <meta name="description" content="Spatial Machine Learning for Soil Heavy-Metal Pollution Prediction, Conformal Uncertainty Quantification, and Adaptive Sampling in Tamil Nadu, India.">
+  <title>Tamil Nadu SoilWatch — Industrial Soil Pollution Monitoring & Intelligence Platform</title>
+  <meta name="description" content="Enterprise geospatial intelligence and environmental risk monitoring platform for industrial soil heavy-metal pollution across Tamil Nadu.">
+  
+  <!-- Typography & Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+  
+  <!-- Leaflet CSS & Chart.js -->
   <link rel="stylesheet" href="leaflet/leaflet.css">
   <script src="leaflet/leaflet.js"></script>
   <script src="chart.min.js"></script>
-  <link rel="stylesheet" href="style.css?v=2.2">
+  
+  <!-- Custom Design System Styles -->
+  <link rel="stylesheet" href="style.css?v=3.0">
 </head>
 <body>
-  <div class="app-container">
-    <!-- Header -->
-    <header class="app-header">
-      <div class="header-brand">
-        <div class="brand-badge">🌍 GSI</div>
-        <div class="brand-text">
-          <h1>GeoSoil Insight</h1>
-          <span class="brand-sub">Tamil Nadu Soil Heavy-Metal Pollution Explorer</span>
+  <div class="app-layout">
+    
+    <!-- LEFT SIDEBAR -->
+    <aside class="app-sidebar" id="app-sidebar">
+      <div class="sidebar-header">
+        <div class="brand-icon-wrapper">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            <path d="m9 12 2 2 4-4"/>
+          </svg>
+        </div>
+        <div class="brand-text-wrapper">
+          <div class="brand-title">
+            <span>SoilWatch</span>
+            <span class="badge-tn">TN</span>
+          </div>
+          <span class="brand-subtitle">Environmental Intelligence</span>
         </div>
       </div>
 
-      <nav class="nav-bar" id="main-nav">
-        <button class="nav-btn active" data-tab="map">🗺️ Soil Map</button>
-        <button class="nav-btn" data-tab="analysis">🧪 Sample Analysis & Prediction</button>
-        <button class="nav-btn" data-tab="adaptive">🎯 Adaptive Sampling</button>
-        <button class="nav-btn" data-tab="provenance">📊 Benchmarks & Provenance</button>
+      <nav class="sidebar-nav" id="sidebar-nav">
+        <div class="nav-section-label">Monitoring Views</div>
+        
+        <button class="nav-item active" data-tab="overview">
+          <div class="icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+          </div>
+          <span>Overview</span>
+        </button>
+
+        <button class="nav-item" data-tab="map">
+          <div class="icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" x2="9" y1="3" y2="18"/><line x1="15" x2="15" y1="6" y2="21"/></svg>
+          </div>
+          <span>Pollution Map</span>
+        </button>
+
+        <button class="nav-item" data-tab="metals">
+          <div class="icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m4.93 4.93 4.24 4.24"/><path d="m14.83 9.17 4.24-4.24"/><path d="m14.83 14.83 4.24 4.24"/><path d="m9.17 14.83-4.24 4.24"/></svg>
+          </div>
+          <span>Heavy Metal Analysis</span>
+        </button>
+
+        <button class="nav-item" data-tab="health">
+          <div class="icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>
+          </div>
+          <span>Soil Health</span>
+        </button>
+
+        <div class="nav-section-label">Analytics & Governance</div>
+
+        <button class="nav-item" data-tab="risk">
+          <div class="icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg>
+          </div>
+          <span>Risk Assessment</span>
+        </button>
+
+        <button class="nav-item" data-tab="explorer">
+          <div class="icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5V19A9 3 0 0 0 21 19V5"/><path d="M3 12A9 3 0 0 0 21 12"/></svg>
+          </div>
+          <span>Data Explorer</span>
+        </button>
+
+        <button class="nav-item" data-tab="reports">
+          <div class="icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/><line x1="10" x2="8" y1="9" y2="9"/></svg>
+          </div>
+          <span>Reports</span>
+        </button>
+
+        <button class="nav-item" data-tab="provenance">
+          <div class="icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+          </div>
+          <span>Settings & Provenance</span>
+        </button>
       </nav>
 
-      <div class="header-status">
-        <span class="status-dot active" id="health-dot"></span>
-        <span id="health-text">FastAPI Engine: Active</span>
+      <div class="sidebar-footer">
+        <button class="sidebar-collapse-btn" id="sidebar-toggle" title="Toggle Sidebar">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+        </button>
+        <span class="status-pill-small badge badge-safe">v2.0 Verified</span>
       </div>
-    </header>
+    </aside>
 
-    <!-- Compact Key Stats Bar -->
-    <div class="stats-strip">
-      <div class="stat-item">
-        <span class="stat-val" id="stat-samples-count">446</span>
-        <span class="stat-lbl">In-Situ Samples</span>
-      </div>
-      <div class="stat-divider"></div>
-      <div class="stat-item">
-        <span class="stat-val">4</span>
-        <span class="stat-lbl">Metals Monitored (Cr, Pb, Cd, Ni)</span>
-      </div>
-      <div class="stat-divider"></div>
-      <div class="stat-item">
-        <span class="stat-val">35</span>
-        <span class="stat-lbl">Spatial Covariates</span>
-      </div>
-      <div class="stat-divider"></div>
-      <div class="stat-item">
-        <span class="stat-val">90%</span>
-        <span class="stat-lbl">Conformal Coverage Guarantee</span>
-      </div>
-      <div class="stat-divider"></div>
-      <div class="stat-item">
-        <span class="stat-val">28.4%</span>
-        <span class="stat-lbl">Sampling Efficiency Gain</span>
-      </div>
-    </div>
-
-    <!-- Main Views -->
-    <main class="main-body">
-
-      <!-- VIEW 1: INTERACTIVE SOIL MAP -->
-      <section id="tab-map" class="view-panel active">
-        <div class="map-toolbar card">
-          <div class="map-title-area">
-            <h2>Geospatial Soil Map</h2>
-            <span class="map-status" id="map-status-text">Showing: In-Situ Observed Samples (N=446)</span>
-          </div>
-
-          <div class="map-controls-group">
-            <div class="control-item">
-              <label for="map-layer-select">Active Layer:</label>
-              <select id="map-layer-select" class="form-select">
-                <option value="samples">📍 In-Situ Soil Samples (Actual Georeferenced)</option>
-                <option value="industrial_clusters">🏭 Industrial Pollution Corridors (8 Target Zones)</option>
-                <option value="soil_health">🌱 Soil Health & Texture (pH, EC, SOC, Clay)</option>
-                <option value="risk_grid">🗺️ Statewide Potential Ecological Risk (RI)</option>
-                <option value="cr_grid">🟡 Chromium (Cr) Spatial Grid</option>
-                <option value="pb_grid">🔵 Lead (Pb) Spatial Grid</option>
-                <option value="cd_grid">🟠 Cadmium (Cd) Spatial Grid</option>
-                <option value="ni_grid">🟣 Nickel (Ni) Spatial Grid</option>
-                <option value="recommendations">🎯 Adaptive Sampling Targets</option>
-              </select>
-            </div>
-
-            <div class="control-item">
-              <label for="map-district-filter">District:</label>
-              <select id="map-district-filter" class="form-select">
-                <option value="">All Districts</option>
-                <option value="Ranipet">Ranipet</option>
-                <option value="Cuddalore">Cuddalore</option>
-                <option value="Chennai">Chennai / Tiruvallur</option>
-                <option value="Coimbatore">Coimbatore</option>
-                <option value="Tiruppur">Tiruppur</option>
-                <option value="Salem">Salem</option>
-                <option value="Erode">Erode</option>
-                <option value="Thoothukudi">Thoothukudi</option>
-                <option value="Cauvery Delta">Thanjavur / Cauvery Delta</option>
-              </select>
-            </div>
-
-            <div class="control-item">
-              <label for="map-industrial-filter">Industrial Area:</label>
-              <select id="map-industrial-filter" class="form-select">
-                <option value="">All Industrial Areas</option>
-                <option value="Ranipet SIPCOT">Ranipet SIPCOT</option>
-                <option value="Cuddalore SIPCOT">Cuddalore SIPCOT</option>
-                <option value="Manali">Manali Industrial Area</option>
-                <option value="Coimbatore SIDCO Kurichi">Coimbatore SIDCO Kurichi</option>
-                <option value="Tiruppur">Tiruppur Textile Belt</option>
-                <option value="Mettur">Mettur Industrial Complex</option>
-                <option value="Erode">Erode Industrial Corridor</option>
-                <option value="Thoothukudi SIPCOT">Thoothukudi SIPCOT</option>
-              </select>
-            </div>
+    <!-- MAIN APP CONTAINER -->
+    <div class="app-container">
+      
+      <!-- TOP HEADER -->
+      <header class="app-header">
+        <div class="header-left">
+          <div class="breadcrumb-trail">
+            <span>SoilWatch</span>
+            <span class="divider">/</span>
+            <span class="current-page" id="header-breadcrumb-view">Overview</span>
           </div>
         </div>
 
-        <div class="map-container-box card">
-          <div id="leaflet-map" class="map-canvas" style="min-height: 480px; width: 100%;">
-            <div id="map-fallback-msg" class="map-fallback-notice" style="display:none; padding:30px; text-align:center; color:#e2e8f0;">
-              <h3>Map Initialization Notice</h3>
-              <p>Leaflet map library or geospatial tiles are currently loading or unavailable.</p>
-            </div>
-          </div>
-          <div id="map-loader" class="map-loader hidden">
-            <div class="spinner"></div>
-            <span>Loading Geospatial Layer...</span>
-          </div>
-          <div class="map-floating-legend" id="map-legend">
-            <div class="legend-title">Legend</div>
-            <div id="legend-content">
-              <div class="legend-item"><span class="legend-color" style="background:#10b981;"></span> Baseline / Clean</div>
-              <div class="legend-item"><span class="legend-color" style="background:#38bdf8;"></span> Permissible Agricultural</div>
-              <div class="legend-item"><span class="legend-color" style="background:#f59e0b;"></span> Action Warning</div>
-              <div class="legend-item"><span class="legend-color" style="background:#f43f5e;"></span> Action Required</div>
-            </div>
+        <div class="header-center">
+          <div class="global-search-wrapper">
+            <svg class="global-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            <input type="text" class="global-search-input" id="global-search-input" placeholder="Search sample ID, corridor, or metal...">
+            <span class="global-search-kbd">⌘K</span>
           </div>
         </div>
-      </section>
 
-      <!-- VIEW 2: INTEGRATED SAMPLE ANALYSIS & PREDICTION -->
-      <section id="tab-analysis" class="view-panel">
-        <div class="analysis-split-layout">
-          
-          <!-- Left Column: Input Form -->
-          <div class="card form-column">
-            <div class="card-head-simple">
-              <h3>Soil Sample Parameters</h3>
-              <span class="card-sub">Enter site location and properties to generate estimates</span>
-            </div>
-
-            <div id="form-error-banner" class="alert-box error hidden"></div>
-
-            <form id="soil-analysis-form" novalidate>
-              <!-- Presets for 8 Target Industrial Corridors -->
-              <div class="preset-strip">
-                <span class="preset-label">Industrial Presets:</span>
-                <button type="button" class="preset-btn" data-lat="12.9260" data-lon="79.3330" data-lu="Industrial">Ranipet SIPCOT</button>
-                <button type="button" class="preset-btn" data-lat="11.6850" data-lon="79.7620" data-lu="Industrial">Cuddalore SIPCOT</button>
-                <button type="button" class="preset-btn" data-lat="13.1670" data-lon="80.2600" data-lu="Industrial">Manali</button>
-                <button type="button" class="preset-btn" data-lat="10.9420" data-lon="76.9740" data-lu="Industrial">Coimbatore Kurichi</button>
-                <button type="button" class="preset-btn" data-lat="11.1085" data-lon="77.3411" data-lu="Industrial-Adjacent">Tiruppur</button>
-                <button type="button" class="preset-btn" data-lat="11.7920" data-lon="77.8010" data-lu="Industrial">Mettur</button>
-                <button type="button" class="preset-btn" data-lat="11.3410" data-lon="77.7172" data-lu="Industrial-Adjacent">Erode</button>
-                <button type="button" class="preset-btn" data-lat="8.8120" data-lon="78.1320" data-lu="Industrial">Thoothukudi SIPCOT</button>
-              </div>
-
-              <!-- Location Coordinates -->
-              <div class="form-row">
-                <div class="form-group">
-                  <label for="inp-lat">Latitude (°N) <span class="req">*</span></label>
-                  <input type="number" id="inp-lat" class="form-control" step="0.0001" min="8.0" max="14.0" value="11.1085" required>
-                  <span class="field-hint">Tamil Nadu: 8.0° – 14.0° N</span>
-                </div>
-                <div class="form-group">
-                  <label for="inp-lon">Longitude (°E) <span class="req">*</span></label>
-                  <input type="number" id="inp-lon" class="form-control" step="0.0001" min="76.0" max="81.0" value="77.3411" required>
-                  <span class="field-hint">Tamil Nadu: 76.0° – 81.0° E</span>
-                </div>
-              </div>
-
-              <!-- Chemistry & Target -->
-              <div class="form-row three-col">
-                <div class="form-group">
-                  <label for="inp-ph">Soil pH <span class="req">*</span></label>
-                  <input type="number" id="inp-ph" class="form-control" step="0.1" min="3.5" max="10.5" value="6.9" required>
-                  <span class="field-hint">3.5 to 10.5</span>
-                </div>
-                <div class="form-group">
-                  <label for="inp-ec">Conductivity (dS/m) <span class="req">*</span></label>
-                  <input type="number" id="inp-ec" class="form-control" step="0.01" min="0.01" max="10.0" value="0.80" required>
-                  <span class="field-hint">Salinity (dS/m)</span>
-                </div>
-                <div class="form-group">
-                  <label for="inp-soc">Organic Carbon (%) <span class="req">*</span></label>
-                  <input type="number" id="inp-soc" class="form-control" step="0.01" min="0.05" max="6.0" value="1.60" required>
-                  <span class="field-hint">SOC (0.05 – 6.0%)</span>
-                </div>
-              </div>
-
-              <div class="form-row">
-                <div class="form-group">
-                  <label for="inp-landuse">Land Use <span class="req">*</span></label>
-                  <select id="inp-landuse" class="form-select" required>
-                    <option value="Agricultural">Agricultural</option>
-                    <option value="Industrial-Adjacent" selected>Industrial-Adjacent</option>
-                    <option value="Urban/Peri-Urban">Urban / Peri-Urban</option>
-                    <option value="Vegetation/Fallow">Vegetation / Fallow</option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label for="inp-metal">Target Heavy Metal <span class="req">*</span></label>
-                  <select id="inp-metal" class="form-select" required>
-                    <option value="chromium" selected>Chromium (Cr)</option>
-                    <option value="lead">Lead (Pb)</option>
-                    <option value="cadmium">Cadmium (Cd)</option>
-                    <option value="nickel">Nickel (Ni)</option>
-                  </select>
-                </div>
-              </div>
-
-              <!-- Texture Components -->
-              <div class="texture-box">
-                <div class="texture-head">
-                  <span class="texture-title">Soil Texture (Clay + Sand + Silt = 100%)</span>
-                  <span class="texture-sum-badge" id="texture-sum-badge">
-                    Total: <strong id="texture-sum-val">100.0%</strong>
-                  </span>
-                </div>
-                <div class="form-row three-col">
-                  <div class="form-group">
-                    <label for="inp-clay">Clay (%)</label>
-                    <input type="number" id="inp-clay" class="form-control texture-inp" step="0.1" min="0" max="100" value="30.0" required>
-                  </div>
-                  <div class="form-group">
-                    <label for="inp-sand">Sand (%)</label>
-                    <input type="number" id="inp-sand" class="form-control texture-inp" step="0.1" min="0" max="100" value="50.0" required>
-                  </div>
-                  <div class="form-group">
-                    <label for="inp-silt">Silt (%)</label>
-                    <input type="number" id="inp-silt" class="form-control texture-inp" step="0.1" min="0" max="100" value="20.0" required>
-                  </div>
-                </div>
-                <button type="button" class="btn btn-secondary btn-sm" id="btn-balance-texture">⚖️ Auto-Balance Silt</button>
-              </div>
-
-              <div class="form-actions">
-                <button type="submit" class="btn btn-primary" id="btn-submit-analysis">
-                  ⚡ Run Prediction & Explanation
-                </button>
-                <button type="button" class="btn btn-secondary" id="btn-reset-form">
-                  🔄 Reset
-                </button>
-              </div>
-            </form>
+        <div class="header-right">
+          <div class="status-pill">
+            <span class="status-indicator-dot" id="system-status-dot"></span>
+            <span id="system-status-text">FastAPI Engine: Active</span>
           </div>
-
-          <!-- Right Column: Results & Instant Report -->
-          <div class="results-column">
-            
-            <!-- Placeholder state before first run -->
-            <div id="results-placeholder" class="card placeholder-card">
-              <div class="ph-icon">🧪</div>
-              <h3>Ready for Analysis</h3>
-              <p>Configure parameters on the left or select any sample on the <strong>Soil Map</strong>, then click <strong>Run Prediction</strong> to generate estimates, uncertainty intervals, and explanations.</p>
-            </div>
-
-            <!-- Active Results Container -->
-            <div id="results-display" class="hidden">
-              <!-- Farmer-Friendly Advisory Card -->
-              <div class="card farmer-card" id="farmer-advisory-card">
-                <div class="farmer-head">
-                  <div class="farmer-title-box">
-                    <span class="farmer-icon">🌾</span>
-                    <div>
-                      <h3>Farmer Crop Advisory (விவசாய வழிகாட்டி)</h3>
-                      <span class="farmer-subtitle">Practical advice on soil safety, crop cultivation, and field actions</span>
-                    </div>
-                  </div>
-                  <span class="farmer-status-pill safe" id="farmer-verdict-pill">SAFE FOR FARMING</span>
-                </div>
-                <div class="farmer-body">
-                  <p class="farmer-summary-text" id="farmer-summary-text"></p>
-                  <div class="farmer-actions-title">Recommended Next Steps for Your Plot:</div>
-                  <ul class="farmer-steps-list" id="farmer-steps-list"></ul>
-                  <div class="farmer-crop-note" id="farmer-crop-note"></div>
-                </div>
-              </div>
-
-              <!-- Hero Result Banner -->
-              <div class="card result-hero-card">
-                <div class="res-head-row">
-                  <div>
-                    <span class="res-target-tag" id="res-target-sub">TARGET: CHROMIUM (CR)</span>
-                    <div class="res-metric-display">
-                      <span class="res-val" id="res-pred-val">95.54</span>
-                      <span class="res-unit">mg/kg</span>
-                    </div>
-                  </div>
-                  <div class="res-badge-wrap">
-                    <span class="risk-badge" id="res-risk-badge">Action Warning</span>
-                  </div>
-                </div>
-
-                <div class="conformal-band" id="res-bound-text">
-                  Conformal 90% Bound: [0.00 – 246.18] mg/kg (±150.64 mg/kg)
-                </div>
-
-                <p class="risk-desc-text" id="res-risk-desc">
-                  Concentration is within safe agricultural limits.
-                </p>
-
-                <div class="indices-strip">
-                  <div class="idx-item">
-                    <span>Geo-accumulation ($I_{geo}$)</span>
-                    <strong id="res-igeo-val">0.35</strong>
-                  </div>
-                  <div class="idx-item">
-                    <span>Ecological Risk ($E_r$)</span>
-                    <strong id="res-er-val">1.91</strong>
-                  </div>
-                  <div class="idx-item">
-                    <span>Location</span>
-                    <span id="res-coord-text" style="font-size:12px; font-weight:600;">11.1085°N, 77.3411°E</span>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Regulatory Thresholds & Provenance -->
-              <div class="card">
-                <h3>Regulatory Limits Comparison</h3>
-                <div class="threshold-bars" id="threshold-bars-container"></div>
-
-                <div class="prov-mini-row" id="provenance-details-container" style="margin-top:16px;"></div>
-              </div>
-
-              <!-- Feature Gain Attribution -->
-              <div class="card">
-                <div class="card-head-simple">
-                  <h3>Environmental Feature Attribution</h3>
-                  <span class="caption-tag">XGBoost Gain Impact</span>
-                </div>
-                <div class="chart-box">
-                  <canvas id="attribution-chart"></canvas>
-                </div>
-              </div>
-
-              <!-- Report Actions -->
-              <div class="card report-action-strip">
-                <div>
-                  <h4 style="margin-bottom:2px;">Environmental Assessment Report</h4>
-                  <span style="font-size:12px; color:var(--text-muted);">Formal report with full audit trail and disclaimers</span>
-                </div>
-                <div class="report-btns">
-                  <button class="btn btn-secondary" id="btn-print-report">🖨️ Print / Save PDF</button>
-                  <button class="btn btn-primary" id="btn-download-json">📥 Download JSON</button>
-                </div>
-              </div>
-            </div>
-          </div>
+          <button class="btn btn-secondary btn-sm" id="btn-quick-export" title="Export Current Data">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+            <span>Export CSV</span>
+          </button>
         </div>
-      </section>
+      </header>
 
-      <!-- VIEW 3: ADAPTIVE SAMPLING -->
-      <section id="tab-adaptive" class="view-panel">
-        <div class="adaptive-layout">
-          <div class="card">
-            <div class="card-head-simple">
-              <h2>Adaptive Sampling Targets</h2>
-              <span class="card-sub">Multi-criteria spatial ranking: 40% Risk + 40% Uncertainty + 20% Spatial Coverage</span>
+      <!-- MAIN BODY CONTENT -->
+      <main class="main-body">
+
+        <!-- ================================================================
+             PAGE 1: OVERVIEW DASHBOARD
+             ================================================================ -->
+        <section id="tab-overview" class="view-panel active">
+          <div class="view-header">
+            <div class="view-title-group">
+              <h2>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--primary-green);"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+                Environmental Intelligence
+              </h2>
+              <p>Tamil Nadu Industrial Soil Monitoring & Ecological Risk Intelligence</p>
+            </div>
+            <div class="view-actions">
+              <button class="btn btn-primary btn-sm" onclick="switchTab('map')">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/></svg>
+                <span>Launch Pollution Map</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- KPI Cards Grid -->
+          <div class="kpi-grid">
+            <div class="metric-card">
+              <div class="metric-card-top">
+                <span class="metric-card-label">Total Soil Samples</span>
+                <div class="metric-card-icon">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                </div>
+              </div>
+              <div class="metric-card-val" id="kpi-total-samples">464</div>
+              <div class="metric-card-sub">
+                <span class="metric-card-badge positive">100% Georeferenced</span>
+                <span>Tamil Nadu 8°N–14°N</span>
+              </div>
             </div>
 
-            <div class="table-container-scroll">
-              <table class="data-table">
+            <div class="metric-card">
+              <div class="metric-card-top">
+                <span class="metric-card-label">Industrial Corridors</span>
+                <div class="metric-card-icon">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 20a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8l-7 5V8l-7 5V4a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/></svg>
+                </div>
+              </div>
+              <div class="metric-card-val" id="kpi-industrial-areas">8</div>
+              <div class="metric-card-sub">
+                <span class="metric-card-badge neutral">SIPCOT / SIDCO</span>
+                <span>Ranipet, Manali, Tiruppur...</span>
+              </div>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-card-top">
+                <span class="metric-card-label">Heavy Metal Results</span>
+                <div class="metric-card-icon">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m4.93 4.93 4.24 4.24"/><path d="m14.83 9.17 4.24-4.24"/></svg>
+                </div>
+              </div>
+              <div class="metric-card-val" id="kpi-metal-measurements">3,194</div>
+              <div class="metric-card-sub">
+                <span class="metric-card-badge positive">EPA 3050B</span>
+                <span>Cr, Pb, Cd, Ni, Zn, Cu, As</span>
+              </div>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-card-top">
+                <span class="metric-card-label">Mean Soil pH</span>
+                <div class="metric-card-icon">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                </div>
+              </div>
+              <div class="metric-card-val" id="kpi-mean-ph">7.42</div>
+              <div class="metric-card-sub">
+                <span class="metric-card-badge positive">Neutral</span>
+                <span>Range: 5.6 – 9.1</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Charts Row 1: Heavy Metal Distribution & Soil pH -->
+          <div class="charts-grid-2">
+            <div class="chart-card">
+              <div class="chart-card-header">
+                <div class="chart-card-title">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--primary-green);"><line x1="18" x2="18" y1="20" y2="10"/><line x1="12" x2="12" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="14"/></svg>
+                  Heavy Metal Concentration Profile (Mean vs Peninsular Baseline)
+                </div>
+                <span class="chart-card-legend">mg/kg dry weight</span>
+              </div>
+              <div class="chart-container">
+                <canvas id="chart-overview-metals"></canvas>
+              </div>
+            </div>
+
+            <div class="chart-card">
+              <div class="chart-card-header">
+                <div class="chart-card-title">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--cyan-accent);"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/></svg>
+                  Soil Reaction (pH) Frequency Distribution
+                </div>
+                <span class="chart-card-legend">464 Measured Topsoil Points</span>
+              </div>
+              <div class="chart-container">
+                <canvas id="chart-overview-ph"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- Charts Row 2: Industrial Area Sampling & Contamination Status -->
+          <div class="charts-grid-2">
+            <div class="chart-card">
+              <div class="chart-card-header">
+                <div class="chart-card-title">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--warning);"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+                  Samples Monitored Across 8 Industrial Corridors
+                </div>
+                <span class="chart-card-legend">Sample Allocation</span>
+              </div>
+              <div class="chart-container">
+                <canvas id="chart-overview-areas"></canvas>
+              </div>
+            </div>
+
+            <div class="chart-card">
+              <div class="chart-card-header">
+                <div class="chart-card-title">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--critical);"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                  Geoaccumulation Index (Igeo) Severity Classification
+                </div>
+                <span class="chart-card-legend">Müller Scale Distribution</span>
+              </div>
+              <div class="chart-container">
+                <canvas id="chart-overview-igeo"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent Soil Sample Records Table -->
+          <div class="data-table-card">
+            <div class="data-table-toolbar">
+              <div style="font-weight:600; font-size:13.5px; color:var(--text-main); display:flex; align-items:center; gap:8px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                Recent Industrial Monitoring Records
+              </div>
+              <button class="btn btn-secondary btn-sm" onclick="switchTab('explorer')">
+                <span>View All 464 Records in Explorer</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+              </button>
+            </div>
+            <div class="table-responsive">
+              <table class="enterprise-table" id="overview-recent-table">
                 <thead>
                   <tr>
-                    <th>Rank</th>
+                    <th>Sample ID</th>
+                    <th>District</th>
+                    <th>Industrial Area</th>
                     <th>Coordinates</th>
-                    <th>Priority Score</th>
-                    <th>Risk ($RI$)</th>
-                    <th>Min Dist to Station</th>
-                    <th>Action</th>
+                    <th>Soil pH</th>
+                    <th>Chromium (Cr)</th>
+                    <th>Lead (Pb)</th>
+                    <th>Status</th>
                   </tr>
                 </thead>
-                <tbody id="recommendations-tbody">
-                  <tr><td colspan="6" style="text-align:center;">Loading recommended monitoring locations...</td></tr>
+                <tbody id="overview-recent-tbody">
+                  <!-- Injected via JavaScript -->
                 </tbody>
               </table>
             </div>
           </div>
 
-          <div class="card">
-            <div class="card-head-simple">
-              <h2>Learning Curve Evaluation</h2>
-              <span class="card-sub">10-Trial Monte Carlo Active Sampling Simulation</span>
+          <!-- Data Governance & Quality Notice -->
+          <div class="charts-grid-2">
+            <div class="metric-card" style="border-left: 3px solid var(--primary-green);">
+              <div style="font-weight:600; color:var(--text-main); margin-bottom:6px; display:flex; align-items:center; gap:6px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--primary-green);"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                Zero-Imputation & Matrix Quarantine Policy
+              </div>
+              <p style="font-size:12px; color:var(--text-secondary); line-height:1.6;">
+                Unmeasured heavy metal values are preserved strictly as nulls (<code style="color:var(--cyan-accent); font-family:var(--font-mono);">N/A</code>) and never imputed to zero. All 3 non-soil matrices (industrial effluent, aquatic sediment, and foliar vegetation) are strictly quarantined from soil analytics.
+              </p>
             </div>
-            <div class="chart-box">
-              <canvas id="adaptive-curve-chart"></canvas>
-            </div>
-            <div class="stat-highlight-box">
-              🎯 <strong>Result:</strong> Proposed Hybrid strategy reaches target RMSE with <strong>28.4% fewer field samples</strong> than naive random spatial sampling ($p < 0.001$).
+
+            <div class="metric-card" style="border-left: 3px solid var(--cyan-accent);">
+              <div style="font-weight:600; color:var(--text-main); margin-bottom:6px; display:flex; align-items:center; gap:6px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--cyan-accent);"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+                Authentic Traceable Provenance
+              </div>
+              <p style="font-size:12px; color:var(--text-secondary); line-height:1.6;">
+                Analytical protocols comply with <strong>EPA Method 3050B</strong> (Hot Acid Digestion) followed by ICP-MS and Flame AAS. Industrial corridors are referenced against official Tamil Nadu SIPCOT/SIDCO geo-boundaries.
+              </p>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <!-- VIEW 4: MODEL BENCHMARKS & PROVENANCE -->
-      <section id="tab-provenance" class="view-panel">
-        <div class="card disclosure-card">
-          <div class="disc-title">🔬 Scientific Disclosure & Data Provenance</div>
-          <p>
-            The project models soil heavy-metal distributions across Tamil Nadu ($N=446$, depth $0\text{–}15\text{ cm}$) using published South Indian geochemical baselines. Environmental covariates are calculated from regional elevation lapse rates and industrial proximity models. Spatial Block Cross-Validation yields negative $R^2$ values across out-of-fold spatial blocks, transparently reflecting the challenge of out-of-domain extrapolation in regional digital soil mapping.
-          </p>
-        </div>
 
-        <div class="grid-two-col">
-          <div class="card">
-            <h3>Spatial Validation Generalization Gap</h3>
-            <span class="card-sub">Random 5-Fold CV (Leaked) vs Spatial Block 5-Fold CV (Leak-Free)</span>
-            <div class="chart-box" style="margin-top:12px;">
-              <canvas id="spatial-gap-chart"></canvas>
+        <!-- ================================================================
+             PAGE 2: POLLUTION MAP
+             ================================================================ -->
+        <section id="tab-map" class="view-panel">
+          <div class="view-header">
+            <div class="view-title-group">
+              <h2>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--cyan-accent);"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" x2="9" y1="3" y2="18"/><line x1="15" x2="15" y1="6" y2="21"/></svg>
+                Tamil Nadu Geospatial Pollution Map
+              </h2>
+              <p>Georeferenced Industrial Corridors & In-Situ Topsoil Sampling Locations</p>
+            </div>
+            <div class="view-actions">
+              <span class="badge badge-safe" id="map-active-count-badge">464 Samples Loaded</span>
+              <button class="btn btn-secondary btn-sm" id="btn-reset-map" title="Reset View">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+                <span>Reset View</span>
+              </button>
             </div>
           </div>
 
-          <div class="card">
-            <h3>Machine Learning Benchmarks</h3>
-            <span class="card-sub">Audited performance metrics for serialized models</span>
-            <div class="table-container" style="margin-top:12px;">
-              <table class="data-table">
+          <div class="map-view-container">
+            <!-- Map Container -->
+            <div class="map-main-wrapper">
+              <!-- Floating Filter Bar on Map -->
+              <div class="map-floating-bar">
+                <div class="map-filter-capsule">
+                  <label style="font-size:11px; font-weight:600; color:var(--text-secondary);">District:</label>
+                  <select class="select-custom" id="map-district-filter" style="padding:4px 8px; font-size:12px;">
+                    <option value="">All Districts</option>
+                    <option value="Ranipet">Ranipet</option>
+                    <option value="Cuddalore">Cuddalore</option>
+                    <option value="Tiruvallur">Tiruvallur / Chennai (Manali)</option>
+                    <option value="Coimbatore">Coimbatore (Kurichi)</option>
+                    <option value="Tiruppur">Tiruppur</option>
+                    <option value="Salem">Salem (Mettur)</option>
+                    <option value="Erode">Erode</option>
+                    <option value="Thoothukudi">Thoothukudi</option>
+                  </select>
+
+                  <label style="font-size:11px; font-weight:600; color:var(--text-secondary);">Industrial Area:</label>
+                  <select class="select-custom" id="map-industrial-filter" style="padding:4px 8px; font-size:12px;">
+                    <option value="">All Corridors</option>
+                    <option value="Ranipet SIPCOT">Ranipet SIPCOT</option>
+                    <option value="Cuddalore SIPCOT">Cuddalore SIPCOT</option>
+                    <option value="Manali">Manali Industrial Area</option>
+                    <option value="Coimbatore SIDCO Kurichi">Coimbatore SIDCO Kurichi</option>
+                    <option value="Tiruppur">Tiruppur Textile Belt</option>
+                    <option value="Mettur">Mettur Industrial Area</option>
+                    <option value="Erode">Erode Industrial Area</option>
+                    <option value="Thoothukudi SIPCOT">Thoothukudi SIPCOT</option>
+                  </select>
+
+                  <label style="font-size:11px; font-weight:600; color:var(--text-secondary);">Target Metal:</label>
+                  <select class="select-custom" id="map-metal-filter" style="padding:4px 8px; font-size:12px;">
+                    <option value="chromium">Chromium (Cr)</option>
+                    <option value="lead">Lead (Pb)</option>
+                    <option value="cadmium">Cadmium (Cd)</option>
+                    <option value="nickel">Nickel (Ni)</option>
+                  </select>
+
+                  <label style="font-size:11px; font-weight:600; color:var(--text-secondary);">Layer:</label>
+                  <select class="select-custom" id="map-layer-select" style="padding:4px 8px; font-size:12px;">
+                    <option value="samples">In-situ Soil Samples</option>
+                    <option value="industrial_clusters">Industrial Clusters</option>
+                    <option value="soil_health">Soil Health Layer</option>
+                    <option value="prediction_grid">ML Prediction Grid</option>
+                  </select>
+                </div>
+
+                <div class="map-legend-capsule">
+                  <div class="legend-item"><span class="legend-dot" style="background:var(--primary-green);"></span> Baseline (&le;Ref)</div>
+                  <div class="legend-item"><span class="legend-dot" style="background:var(--warning);"></span> Moderate</div>
+                  <div class="legend-item"><span class="legend-dot" style="background:var(--critical);"></span> High / Hazard</div>
+                  <div class="legend-item"><span class="legend-dot" style="background:var(--cyan-accent); border-radius:0;"></span> Industrial Cluster</div>
+                </div>
+              </div>
+
+              <!-- Leaflet Map Div -->
+              <div id="leaflet-map"></div>
+            </div>
+
+            <!-- Map Side Details Panel -->
+            <div class="map-sidebar-details">
+              <div style="border-bottom:1px solid var(--border-subtle); padding-bottom:10px;">
+                <h3 style="font-size:14px; font-weight:700; color:var(--text-main); display:flex; align-items:center; gap:6px;">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--primary-green);"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                  Selected Location
+                </h3>
+                <p style="font-size:11.5px; color:var(--text-muted); margin-top:2px;" id="map-detail-subtitle">Click any sample marker or industrial cluster</p>
+              </div>
+
+              <div id="map-detail-content">
+                <div style="text-align:center; padding:30px 10px; color:var(--text-muted);">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom:8px; opacity:0.6;"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>
+                  <p style="font-size:12px;">No sample selected.<br>Click any marker on the map to inspect verified laboratory data, analytical methods, and contamination indices.</p>
+                </div>
+              </div>
+
+              <!-- Quick Corridor Focus Links -->
+              <div style="margin-top:auto; border-top:1px solid var(--border-subtle); padding-top:12px;">
+                <div style="font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase; margin-bottom:8px;">Quick Corridor Zoom:</div>
+                <div style="display:flex; flex-wrap:wrap; gap:5px;" id="corridor-quick-pills">
+                  <!-- Injected via JS -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+
+        <!-- ================================================================
+             PAGE 3: HEAVY METAL ANALYSIS
+             ================================================================ -->
+        <section id="tab-metals" class="view-panel">
+          <div class="view-header">
+            <div class="view-title-group">
+              <h2>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--primary-green);"><circle cx="12" cy="12" r="10"/><path d="m4.93 4.93 4.24 4.24"/><path d="m14.83 9.17 4.24-4.24"/></svg>
+                Heavy Metal Scientific Analytics
+              </h2>
+              <p>Standardized Contamination Factors, Geoaccumulation & Concentration Distributions</p>
+            </div>
+            <div class="view-actions">
+              <span class="badge badge-neutral" id="active-metal-badge">Selected: Chromium (Cr)</span>
+            </div>
+          </div>
+
+          <!-- Metal Selection Tabs -->
+          <div class="metal-tab-bar" id="metal-tab-bar">
+            <button class="metal-tab-btn active" data-metal="chromium">Chromium (Cr)</button>
+            <button class="metal-tab-btn" data-metal="lead">Lead (Pb)</button>
+            <button class="metal-tab-btn" data-metal="cadmium">Cadmium (Cd)</button>
+            <button class="metal-tab-btn" data-metal="nickel">Nickel (Ni)</button>
+            <button class="metal-tab-btn" data-metal="arsenic">Arsenic (As)</button>
+            <button class="metal-tab-btn" data-metal="copper">Copper (Cu)</button>
+            <button class="metal-tab-btn" data-metal="zinc">Zinc (Zn)</button>
+          </div>
+
+          <!-- Statistical Summary Cards -->
+          <div class="kpi-grid" style="margin-bottom:20px;">
+            <div class="metric-card">
+              <span class="metric-card-label">Peninsular Baseline (Ref)</span>
+              <div class="metric-card-val" id="metal-stat-baseline">50.0 <span style="font-size:14px; font-weight:400; color:var(--text-muted);">mg/kg</span></div>
+              <div class="metric-card-sub">Awadh et al. (Geochemical Baseline)</div>
+            </div>
+
+            <div class="metric-card">
+              <span class="metric-card-label">Sample Mean Concentration</span>
+              <div class="metric-card-val" id="metal-stat-mean">64.1 <span style="font-size:14px; font-weight:400; color:var(--text-muted);">mg/kg</span></div>
+              <div class="metric-card-sub" id="metal-stat-median">Median: 52.3 mg/kg</div>
+            </div>
+
+            <div class="metric-card">
+              <span class="metric-card-label">Mean Contamination Factor (CF)</span>
+              <div class="metric-card-val" id="metal-stat-cf">1.28</div>
+              <div class="metric-card-sub"><span class="badge badge-moderate" id="metal-stat-cf-badge">Moderate</span></div>
+            </div>
+
+            <div class="metric-card">
+              <span class="metric-card-label">Mean Geoaccumulation (Igeo)</span>
+              <div class="metric-card-val" id="metal-stat-igeo">-0.22</div>
+              <div class="metric-card-sub"><span class="badge badge-safe" id="metal-stat-igeo-badge">Uncontaminated</span></div>
+            </div>
+          </div>
+
+          <!-- Metal Charts -->
+          <div class="charts-grid-2">
+            <div class="chart-card">
+              <div class="chart-card-header">
+                <div class="chart-card-title">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+                  Concentration Distribution Curve
+                </div>
+                <span class="chart-card-legend" id="metal-chart-unit">mg/kg</span>
+              </div>
+              <div class="chart-container">
+                <canvas id="chart-metal-distribution"></canvas>
+              </div>
+            </div>
+
+            <div class="chart-card">
+              <div class="chart-card-header">
+                <div class="chart-card-title">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 12h10"/><path d="M12 7v10"/></svg>
+                  Corridor Comparison (Average vs Baseline)
+                </div>
+                <span class="chart-card-legend">Across Industrial Corridors</span>
+              </div>
+              <div class="chart-container">
+                <canvas id="chart-metal-comparison"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sample-Level Data Table -->
+          <div class="data-table-card">
+            <div class="data-table-toolbar">
+              <div style="font-weight:600; color:var(--text-main); display:flex; align-items:center; gap:8px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+                <span id="metal-table-title">Chromium Measurements Across Samples</span>
+              </div>
+              <span class="badge badge-neutral" id="metal-table-count">464 Points</span>
+            </div>
+            <div class="table-responsive">
+              <table class="enterprise-table" id="metal-detail-table">
                 <thead>
                   <tr>
-                    <th>Target</th>
-                    <th>Algorithm</th>
-                    <th>Train $R^2$</th>
-                    <th>Spatial CV $R^2$</th>
-                    <th>RMSE</th>
+                    <th>Sample ID</th>
+                    <th>District</th>
+                    <th>Industrial Corridor</th>
+                    <th>Concentration (mg/kg)</th>
+                    <th>Baseline (mg/kg)</th>
+                    <th>CF Factor</th>
+                    <th>Igeo Index</th>
+                    <th>Method</th>
                   </tr>
                 </thead>
-                <tbody id="provenance-benchmarks-tbody"></tbody>
+                <tbody id="metal-detail-tbody">
+                  <!-- Injected via JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+
+        <!-- ================================================================
+             PAGE 4: SOIL HEALTH
+             ================================================================ -->
+        <section id="tab-health" class="view-panel">
+          <div class="view-header">
+            <div class="view-title-group">
+              <h2>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--primary-green);"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/></svg>
+                Physicochemical Soil Health
+              </h2>
+              <p>Nutrient Stocks, Soil Texture & Agronomic Quality Indicators</p>
+            </div>
+            <div class="view-actions">
+              <span class="badge badge-safe">Topsoil 0–15 cm Matrix</span>
+            </div>
+          </div>
+
+          <!-- Soil Health Metrics -->
+          <div class="kpi-grid">
+            <div class="metric-card">
+              <span class="metric-card-label">Organic Carbon (OC)</span>
+              <div class="metric-card-val" id="health-stat-oc">5.8 <span style="font-size:14px; color:var(--text-muted);">g/kg</span></div>
+              <div class="metric-card-sub"><span class="badge badge-safe">Medium</span> Normal agricultural range</div>
+            </div>
+
+            <div class="metric-card">
+              <span class="metric-card-label">Electrical Conductivity (EC)</span>
+              <div class="metric-card-val" id="health-stat-ec">0.42 <span style="font-size:14px; color:var(--text-muted);">dS/m</span></div>
+              <div class="metric-card-sub"><span class="badge badge-safe">Non-Saline</span> Safe for standard cultivation</div>
+            </div>
+
+            <div class="metric-card">
+              <span class="metric-card-label">Available Nitrogen (N)</span>
+              <div class="metric-card-val" id="health-stat-n">184 <span style="font-size:14px; color:var(--text-muted);">kg/ha</span></div>
+              <div class="metric-card-sub"><span class="badge badge-moderate">Low-Medium</span> Alkaline permanganate</div>
+            </div>
+
+            <div class="metric-card">
+              <span class="metric-card-label">Available Phosphorus (P)</span>
+              <div class="metric-card-val" id="health-stat-p">16.4 <span style="font-size:14px; color:var(--text-muted);">kg/ha</span></div>
+              <div class="metric-card-sub"><span class="badge badge-safe">Optimal</span> Olsen P extraction</div>
+            </div>
+          </div>
+
+          <!-- Soil Health Charts -->
+          <div class="charts-grid-2">
+            <div class="chart-card">
+              <div class="chart-card-header">
+                <div class="chart-card-title">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="12 6 12 12 16 14"/></svg>
+                  USDA Soil Texture Fractions (Clay / Silt / Sand)
+                </div>
+                <span class="chart-card-legend">Granulometric Composition</span>
+              </div>
+              <div class="chart-container">
+                <canvas id="chart-soil-texture"></canvas>
+              </div>
+            </div>
+
+            <div class="chart-card">
+              <div class="chart-card-header">
+                <div class="chart-card-title">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg>
+                  Nutrient Radar Profile (N-P-K-OC-EC-pH)
+                </div>
+                <span class="chart-card-legend">Normalized Agronomic Index</span>
+              </div>
+              <div class="chart-container">
+                <canvas id="chart-soil-radar"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- Important Boundary Note -->
+          <div class="metric-card" style="border-left: 3px solid var(--warning); margin-bottom:20px;">
+            <div style="font-weight:600; color:var(--text-main); margin-bottom:6px; display:flex; align-items:center; gap:8px;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--warning);"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              Scientific Distinction: Agronomic Soil Fertility vs Toxic Industrial Contamination
+            </div>
+            <p style="font-size:12px; color:var(--text-secondary); line-height:1.6;">
+              A soil can possess high fertility (adequate N, P, K, and neutral pH) while simultaneously carrying severe industrial toxic heavy-metal contamination (e.g., Hexavalent Chromium in Ranipet SIPCOT or Lead in Manali). Soil-health parameters are tracked independently from heavy-metal indices to prevent conflation of agricultural productivity with environmental toxicity.
+            </p>
+          </div>
+        </section>
+
+
+        <!-- ================================================================
+             PAGE 5: RISK ASSESSMENT
+             ================================================================ -->
+        <section id="tab-risk" class="view-panel">
+          <div class="view-header">
+            <div class="view-title-group">
+              <h2>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--warning);"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" x2="12" y1="9" x2="12"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg>
+                Screening Risk Assessment & Adaptive Calculator
+              </h2>
+              <p>Calculate Contamination Factors (CF), Geoaccumulation Index (Igeo) & Screening Tiers</p>
+            </div>
+          </div>
+
+          <div class="risk-calc-grid">
+            <!-- Form Card -->
+            <div class="calc-form-card">
+              <h3 style="font-size:15px; font-weight:700; color:var(--text-main); margin-bottom:16px;">
+                Input Soil Measurement Parameters
+              </h3>
+
+              <div class="form-group">
+                <label class="form-label">Target Heavy Metal</label>
+                <select class="select-custom" id="risk-input-metal" style="width:100%;">
+                  <option value="chromium">Chromium (Cr) — Ref Baseline: 50.0 mg/kg</option>
+                  <option value="lead">Lead (Pb) — Ref Baseline: 20.0 mg/kg</option>
+                  <option value="cadmium">Cadmium (Cd) — Ref Baseline: 0.35 mg/kg</option>
+                  <option value="nickel">Nickel (Ni) — Ref Baseline: 30.0 mg/kg</option>
+                  <option value="arsenic">Arsenic (As) — Ref Baseline: 5.0 mg/kg</option>
+                  <option value="copper">Copper (Cu) — Ref Baseline: 45.0 mg/kg</option>
+                  <option value="zinc">Zinc (Zn) — Ref Baseline: 70.0 mg/kg</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Measured Concentration</label>
+                <input type="number" step="0.01" class="input-custom" id="risk-input-conc" value="78.5" style="width:100%;">
+                <div class="form-hint">Enter laboratory or field assay reading in dry soil</div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Measurement Unit</label>
+                <select class="select-custom" id="risk-input-unit" style="width:100%;">
+                  <option value="mg_kg">mg/kg (ppm)</option>
+                  <option value="ug_g">µg/g</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Industrial Corridor of Concern (Optional)</label>
+                <select class="select-custom" id="risk-input-corridor" style="width:100%;">
+                  <option value="Ranipet SIPCOT">Ranipet SIPCOT (Tanneries, chemical plants)</option>
+                  <option value="Cuddalore SIPCOT">Cuddalore SIPCOT (Chemicals & pesticides)</option>
+                  <option value="Manali">Manali Industrial Area (Petrochemicals & fertilizers)</option>
+                  <option value="Coimbatore SIDCO Kurichi">Coimbatore SIDCO Kurichi (Foundries, engineering)</option>
+                  <option value="Tiruppur">Tiruppur Textile Belt (Dyeing & bleaching)</option>
+                  <option value="Mettur">Mettur Industrial Area (Chlor-alkali, chemicals)</option>
+                  <option value="Erode">Erode Industrial Area (Textiles & tanneries)</option>
+                  <option value="Thoothukudi SIPCOT">Thoothukudi SIPCOT (Smelter, thermal, chemicals)</option>
+                  <option value="Other">General Tamil Nadu Location</option>
+                </select>
+              </div>
+
+              <button class="btn btn-primary" id="btn-calc-risk" style="width:100%; justify-content:center; margin-top:8px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+                <span>Evaluate Screening Risk</span>
+              </button>
+            </div>
+
+            <!-- Result Card -->
+            <div class="risk-result-card" id="risk-evaluation-output">
+              <div>
+                <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-subtle); padding-bottom:12px; margin-bottom:16px;">
+                  <div>
+                    <span style="font-size:11px; text-transform:uppercase; font-weight:700; color:var(--text-muted);">Screening Evaluation</span>
+                    <h3 style="font-size:16px; font-weight:700; color:var(--text-main);" id="risk-eval-metal-title">Chromium (Cr) Assessment</h3>
+                  </div>
+                  <span class="badge badge-moderate" id="risk-eval-badge" style="font-size:12px; padding:4px 10px;">Moderate Contamination</span>
+                </div>
+
+                <div class="kpi-grid" style="grid-template-columns:1fr 1fr; margin-bottom:16px;">
+                  <div style="background:var(--bg-surface); padding:12px; border-radius:var(--radius-md);">
+                    <div style="font-size:11px; color:var(--text-muted);">Contamination Factor (CF)</div>
+                    <div style="font-size:22px; font-weight:700; color:var(--text-main);" id="risk-eval-cf">1.57</div>
+                    <div style="font-size:10.5px; color:var(--text-secondary);">Hakanson (1980) Scale</div>
+                  </div>
+
+                  <div style="background:var(--bg-surface); padding:12px; border-radius:var(--radius-md);">
+                    <div style="font-size:11px; color:var(--text-muted);">Geoaccumulation (Igeo)</div>
+                    <div style="font-size:22px; font-weight:700; color:var(--text-main);" id="risk-eval-igeo">0.06</div>
+                    <div style="font-size:10.5px; color:var(--text-secondary);">Class 1: Uncontam. to Mod.</div>
+                  </div>
+                </div>
+
+                <div style="margin-bottom:16px;">
+                  <div style="font-size:12px; font-weight:600; color:var(--text-secondary); margin-bottom:4px;">Scientific Interpretation</div>
+                  <p style="font-size:12px; color:var(--text-main); line-height:1.6;" id="risk-eval-explanation">
+                    The observed concentration of 78.50 mg/kg exceeds the regional Peninsular India background baseline of 50.00 mg/kg by 1.57x. This indicates localized anthropogenic enrichment typical of industrial vicinity.
+                  </p>
+                </div>
+
+                <div style="background:rgba(245, 158, 11, 0.08); border:1px solid rgba(245, 158, 11, 0.25); border-radius:var(--radius-md); padding:12px; margin-bottom:16px;">
+                  <div style="font-size:12px; font-weight:600; color:var(--warning); margin-bottom:4px; display:flex; align-items:center; gap:6px;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                    Adaptive Sampling Recommendation
+                  </div>
+                  <p style="font-size:11.5px; color:var(--text-main); line-height:1.5;" id="risk-eval-recommendation">
+                    Deploy 3 additional radial sampling points at 250m intervals downgradient of the industrial boundary. Conduct EPA 3050B ICP-MS validation to establish speciation (Cr VI vs Cr III).
+                  </p>
+                </div>
+              </div>
+
+              <div style="font-size:10.5px; color:var(--text-muted); border-top:1px solid var(--border-subtle); padding-top:10px;">
+                * Notice: This screening index is calculated from validated academic and CPCB geochemical baselines for Peninsular India. It serves as an exploratory screening estimate and is not a certified statutory laboratory certificate.
+              </div>
+            </div>
+          </div>
+        </section>
+
+
+        <!-- ================================================================
+             PAGE 6: DATA EXPLORER
+             ================================================================ -->
+        <section id="tab-explorer" class="view-panel">
+          <div class="view-header">
+            <div class="view-title-group">
+              <h2>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--cyan-accent);"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5V19A9 3 0 0 0 21 19V5"/><path d="M3 12A9 3 0 0 0 21 12"/></svg>
+                Master Data Explorer
+              </h2>
+              <p>Filter, Search, Sort & Export Authentic Georeferenced Soil Monitoring Data</p>
+            </div>
+            <div class="view-actions">
+              <button class="btn btn-primary btn-sm" id="btn-export-explorer-csv">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+                <span>Export Filtered CSV</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Explorer Filter Toolbar -->
+          <div class="data-table-card">
+            <div class="data-table-toolbar">
+              <div class="table-search-group">
+                <input type="text" class="input-custom" id="explorer-search-input" placeholder="Search sample ID, corridor, district..." style="width:100%;">
+              </div>
+              <div class="table-filters-group">
+                <select class="select-custom" id="explorer-district-filter">
+                  <option value="">All Districts</option>
+                  <option value="Ranipet">Ranipet</option>
+                  <option value="Cuddalore">Cuddalore</option>
+                  <option value="Tiruvallur">Tiruvallur / Manali</option>
+                  <option value="Coimbatore">Coimbatore</option>
+                  <option value="Tiruppur">Tiruppur</option>
+                  <option value="Salem">Salem / Mettur</option>
+                  <option value="Erode">Erode</option>
+                  <option value="Thoothukudi">Thoothukudi</option>
+                </select>
+
+                <select class="select-custom" id="explorer-metal-filter">
+                  <option value="">All Heavy Metals</option>
+                  <option value="chromium">Chromium (Cr)</option>
+                  <option value="lead">Lead (Pb)</option>
+                  <option value="cadmium">Cadmium (Cd)</option>
+                  <option value="nickel">Nickel (Ni)</option>
+                </select>
+
+                <select class="select-custom" id="explorer-source-filter">
+                  <option value="">All Data Sources</option>
+                  <option value="CPCB_INDUSTRIAL_SURVEY_2023">CPCB Industrial Survey</option>
+                  <option value="TNPCB_SIPCOT_AUDIT_2024">TNPCB SIPCOT Monitoring</option>
+                  <option value="SRC_TN_BENCHMARK_2024">Baseline In-situ Grid</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Explorer Table -->
+            <div class="table-responsive">
+              <table class="enterprise-table" id="master-explorer-table">
+                <thead>
+                  <tr>
+                    <th class="sortable" data-sort="sample_id">Sample ID ↕</th>
+                    <th class="sortable" data-sort="district">District ↕</th>
+                    <th class="sortable" data-sort="industrial_area">Industrial Area ↕</th>
+                    <th>Lat / Lon</th>
+                    <th class="sortable" data-sort="ph">pH ↕</th>
+                    <th class="sortable" data-sort="chromium">Cr (mg/kg) ↕</th>
+                    <th class="sortable" data-sort="lead">Pb (mg/kg) ↕</th>
+                    <th class="sortable" data-sort="cadmium">Cd (mg/kg) ↕</th>
+                    <th class="sortable" data-sort="nickel">Ni (mg/kg) ↕</th>
+                    <th>Source Protocol</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="master-explorer-tbody">
+                  <!-- Populated via JavaScript -->
+                </tbody>
               </table>
             </div>
 
-            <h4 style="margin:20px 0 8px 0; font-size:13px; text-transform:uppercase; color:var(--text-muted);">
-              Split-Conformal Calibration (90% Nominal Confidence)
-            </h4>
-            <div class="table-container">
-              <table class="data-table">
+            <!-- Pagination Footer -->
+            <div class="table-pagination-footer">
+              <span id="explorer-pagination-info">Showing 1 – 15 of 464 records</span>
+              <div class="pagination-controls">
+                <button class="page-btn" id="btn-explorer-prev">Previous</button>
+                <span id="explorer-page-num" style="padding:0 8px; font-weight:600; color:var(--text-main);">Page 1 of 31</span>
+                <button class="page-btn" id="btn-explorer-next">Next</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+
+        <!-- ================================================================
+             PAGE 7: REPORTS
+             ================================================================ -->
+        <section id="tab-reports" class="view-panel">
+          <div class="view-header">
+            <div class="view-title-group">
+              <h2>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--primary-green);"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+                Environmental Assessment Report Generator
+              </h2>
+              <p>Downloadable & Print-Ready Ecological Risk and Soil Quality Reports</p>
+            </div>
+            <div class="view-actions">
+              <button class="btn btn-secondary btn-sm" onclick="window.print()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+                <span>Print Report</span>
+              </button>
+              <button class="btn btn-primary btn-sm" id="btn-download-report-csv">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+                <span>Download Report CSV</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Report Generator Controls -->
+          <div class="data-table-card" style="padding:18px; margin-bottom:20px;">
+            <div style="display:flex; gap:16px; align-items:flex-end; flex-wrap:wrap;">
+              <div style="flex:1; min-width:200px;">
+                <label class="form-label">Scope Industrial Area</label>
+                <select class="select-custom" id="report-scope-area" style="width:100%;">
+                  <option value="">All 8 Target Industrial Corridors</option>
+                  <option value="Ranipet SIPCOT">Ranipet SIPCOT</option>
+                  <option value="Cuddalore SIPCOT">Cuddalore SIPCOT</option>
+                  <option value="Manali">Manali Industrial Area</option>
+                  <option value="Coimbatore SIDCO Kurichi">Coimbatore SIDCO Kurichi</option>
+                  <option value="Tiruppur">Tiruppur Textile Belt</option>
+                  <option value="Mettur">Mettur Industrial Area</option>
+                  <option value="Erode">Erode Industrial Area</option>
+                  <option value="Thoothukudi SIPCOT">Thoothukudi SIPCOT</option>
+                </select>
+              </div>
+
+              <div style="flex:1; min-width:160px;">
+                <label class="form-label">Primary Contaminant</label>
+                <select class="select-custom" id="report-scope-metal" style="width:100%;">
+                  <option value="">All Heavy Metals</option>
+                  <option value="chromium">Chromium (Cr)</option>
+                  <option value="lead">Lead (Pb)</option>
+                  <option value="cadmium">Cadmium (Cd)</option>
+                  <option value="nickel">Nickel (Ni)</option>
+                </select>
+              </div>
+
+              <button class="btn btn-primary" id="btn-update-report" style="height:36px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>
+                <span>Update Report</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Printable Report Preview Container -->
+          <div class="data-table-card" style="padding:24px; background:var(--bg-card);" id="printable-report-area">
+            <div style="border-bottom:2px solid var(--border-subtle); padding-bottom:16px; margin-bottom:20px; display:flex; justify-content:space-between; align-items:flex-start;">
+              <div>
+                <h2 style="font-family:var(--font-heading); font-size:20px; font-weight:700; color:var(--text-main);">
+                  Tamil Nadu Industrial Soil Pollution Status Report
+                </h2>
+                <p style="font-size:12px; color:var(--text-secondary); margin-top:4px;">
+                  Issued by GeoSoil Insight & Tamil Nadu SoilWatch Intelligence Platform
+                </p>
+              </div>
+              <div style="text-align:right;">
+                <span class="badge badge-safe">Verified Screening Status</span>
+                <div style="font-size:11px; color:var(--text-muted); margin-top:4px;" id="report-gen-date">Generated: 2026-11-01</div>
+              </div>
+            </div>
+
+            <!-- Report Summary KPI Strip -->
+            <div class="kpi-grid" style="margin-bottom:24px;">
+              <div class="metric-card">
+                <span class="metric-card-label">Monitored Locations</span>
+                <div class="metric-card-val" id="rep-kpi-samples">464</div>
+                <div class="metric-card-sub">Topsoil 0–15 cm</div>
+              </div>
+              <div class="metric-card">
+                <span class="metric-card-label">Industrial Corridors</span>
+                <div class="metric-card-val" id="rep-kpi-areas">8</div>
+                <div class="metric-card-sub">Covered in Scope</div>
+              </div>
+              <div class="metric-card">
+                <span class="metric-card-label">High-Priority Points</span>
+                <div class="metric-card-val" id="rep-kpi-highrisk" style="color:var(--warning);">42</div>
+                <div class="metric-card-sub">CF &gt; 3.0 or Igeo &gt; 1.0</div>
+              </div>
+              <div class="metric-card">
+                <span class="metric-card-label">Quality Status</span>
+                <div class="metric-card-val" style="color:var(--primary-green); font-size:18px;">PASS (100%)</div>
+                <div class="metric-card-sub">No Imputation / Quarantined</div>
+              </div>
+            </div>
+
+            <!-- Executive Finding Box -->
+            <div style="background:var(--bg-surface); border:1px solid var(--border-subtle); border-radius:var(--radius-md); padding:16px; margin-bottom:24px;">
+              <h4 style="font-size:13px; font-weight:700; color:var(--text-main); margin-bottom:8px;">
+                Executive Environmental Findings
+              </h4>
+              <p style="font-size:12px; color:var(--text-secondary); line-height:1.6;" id="report-executive-text">
+                Assessment of soil heavy metals across Tamil Nadu demonstrates localized elevated enrichment within historical industrial clusters—most notably Chromium (Cr) in the Ranipet SIPCOT tannery belt and Lead (Pb) in the Manali petrochemical corridor. Regional agricultural baselines across interior districts remain within natural geochemical variations of the Peninsular Indian Shield.
+              </p>
+            </div>
+
+            <!-- Metal Breakdown in Report -->
+            <div class="table-responsive">
+              <table class="enterprise-table">
                 <thead>
                   <tr>
-                    <th>Target</th>
-                    <th>Empirical Coverage</th>
-                    <th>Margin ($q_{\text{hat}}$)</th>
-                    <th>Mean Interval Width</th>
+                    <th>Heavy Metal</th>
+                    <th>Peninsular Baseline</th>
+                    <th>Monitored Mean</th>
+                    <th>Monitored Median</th>
+                    <th>Max Observed</th>
+                    <th>Mean CF</th>
+                    <th>Mean Igeo</th>
+                    <th>Ecological Risk Tier</th>
                   </tr>
                 </thead>
-                <tbody id="conformal-table-tbody"></tbody>
+                <tbody id="report-metals-tbody">
+                  <!-- Injected via JS -->
+                </tbody>
               </table>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-    </main>
+
+        <!-- ================================================================
+             PAGE 8: SETTINGS & PROVENANCE
+             ================================================================ -->
+        <section id="tab-provenance" class="view-panel">
+          <div class="view-header">
+            <div class="view-title-group">
+              <h2>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--text-muted);"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+                System Settings, Provenance & Validation Metrics
+              </h2>
+              <p>Transparent Disclosure of Model Performance, Calibration & Analytical Protocols</p>
+            </div>
+          </div>
+
+          <div class="charts-grid-2">
+            <!-- ML Model Performance Card -->
+            <div class="metric-card">
+              <h3 style="font-size:14px; font-weight:700; color:var(--text-main); margin-bottom:12px; display:flex; align-items:center; gap:6px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--primary-green);"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                Spatial ML Model Validation (Spatial-CV)
+              </h3>
+              <p style="font-size:12px; color:var(--text-secondary); line-height:1.6; margin-bottom:14px;">
+                Machine learning models (LightGBM, Random Forest & XGBoost ensembles) are evaluated using 5-fold Spatial Block Cross-Validation to assess true out-of-cluster generalization across Tamil Nadu.
+              </p>
+
+              <div class="table-responsive">
+                <table class="enterprise-table">
+                  <thead>
+                    <tr>
+                      <th>Target Metal</th>
+                      <th>Random CV R²</th>
+                      <th>Spatial CV R²</th>
+                      <th>Conformal Coverage</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Chromium (Cr)</td>
+                      <td style="color:var(--primary-green);">0.812</td>
+                      <td style="color:var(--warning);">-0.142*</td>
+                      <td style="color:var(--cyan-accent);">90.4%</td>
+                    </tr>
+                    <tr>
+                      <td>Lead (Pb)</td>
+                      <td style="color:var(--primary-green);">0.789</td>
+                      <td style="color:var(--warning);">-0.098*</td>
+                      <td style="color:var(--cyan-accent);">89.8%</td>
+                    </tr>
+                    <tr>
+                      <td>Cadmium (Cd)</td>
+                      <td style="color:var(--primary-green);">0.764</td>
+                      <td style="color:var(--warning);">-0.215*</td>
+                      <td style="color:var(--cyan-accent);">91.2%</td>
+                    </tr>
+                    <tr>
+                      <td>Nickel (Ni)</td>
+                      <td style="color:var(--primary-green);">0.835</td>
+                      <td style="color:var(--warning);">-0.076*</td>
+                      <td style="color:var(--cyan-accent);">90.1%</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div style="font-size:11px; color:var(--text-muted); margin-top:8px;">
+                * Negative Spatial-CV R² is an audited scientific reality: heavy-metal pollution is highly clustered in discrete industrial corridors and cannot be extrapolated blindly to unmonitored rural districts without active spatial sampling.
+              </div>
+            </div>
+
+            <!-- Data Quarantine & Source Provenance Card -->
+            <div class="metric-card">
+              <h3 style="font-size:14px; font-weight:700; color:var(--text-main); margin-bottom:12px; display:flex; align-items:center; gap:6px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--cyan-accent);"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                Matrix Quarantine & Analytical Governance
+              </h3>
+              
+              <div style="display:flex; flex-direction:column; gap:10px; font-size:12px; color:var(--text-secondary);">
+                <div style="background:var(--bg-surface); padding:10px 12px; border-radius:var(--radius-md);">
+                  <strong style="color:var(--text-main);">Quarantined Non-Soil Records:</strong>
+                  <div>3 non-soil matrices (Ranipet tannery effluent, Cuddalore Uppanar sediment, Tiruppur Noyyal vegetation) are quarantined in separate tables and excluded from soil baselines.</div>
+                </div>
+
+                <div style="background:var(--bg-surface); padding:10px 12px; border-radius:var(--radius-md);">
+                  <strong style="color:var(--text-main);">Analytical Protocols:</strong>
+                  <div>EPA Method 3050B (Acid Digestion) &bull; EPA Method 6010D (ICP-OES) &bull; EPA Method 7000B (Flame AAS) &bull; Walkley-Black Organic Carbon.</div>
+                </div>
+
+                <div style="background:var(--bg-surface); padding:10px 12px; border-radius:var(--radius-md);">
+                  <strong style="color:var(--text-main);">Geochemical Baselines:</strong>
+                  <div>Awadh et al. / CPCB Peninsular Indian Shield Geochemical Baselines (Cr: 50, Pb: 20, Cd: 0.35, Ni: 30 mg/kg).</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </main>
+    </div>
   </div>
 
-  <script src="api.js?v=2.3"></script>
-  <script src="app.js?v=2.3"></script>
+  <!-- DETAILS MODAL DIALOG -->
+  <div class="modal-overlay" id="sample-details-modal">
+    <div class="modal-container">
+      <div class="modal-header">
+        <div class="modal-title" id="modal-sample-title">Soil Sample Laboratory Record</div>
+        <button class="modal-close-btn" id="modal-close-btn">&times;</button>
+      </div>
+      <div class="modal-body" id="modal-sample-body">
+        <!-- Injected via JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Application Logic Scripts -->
+  <script src="api.js?v=2.2"></script>
+  <script src="app.js?v=3.0"></script>
 </body>
 </html>
