@@ -982,42 +982,62 @@
     const calcBtn = document.getElementById('btn-calc-risk');
     if (!calcBtn) return;
 
-    calcBtn.addEventListener('click', () => {
+    calcBtn.addEventListener('click', async () => {
       const metal = document.getElementById('risk-input-metal').value;
       const conc = parseFloat(document.getElementById('risk-input-conc').value) || 0;
+      const unit = document.getElementById('risk-input-unit') ? document.getElementById('risk-input-unit').value : 'mg/kg';
       const corridor = document.getElementById('risk-input-corridor').value;
 
-      const info = BASELINES[metal] || BASELINES.chromium;
-      const cf = conc / info.baseline;
-      const igeo = Math.log2(conc / (1.5 * info.baseline));
+      try {
+        const res = await api.assessRisk({
+          metal: metal,
+          concentration: conc,
+          unit: unit === 'mg_kg' ? 'mg/kg' : 'ug/g',
+          industrial_area: corridor
+        });
 
-      // Determine severity tier
-      let category = 'Uncontaminated / Baseline';
-      let badgeClass = 'badge-safe';
-      let rec = 'Standard routine monitoring. No immediate environmental remediation required.';
-      if (cf > 6.0 || igeo > 2.0) {
-        category = 'Very High Ecological Risk';
-        badgeClass = 'badge-critical';
-        rec = `Deploy 3 radial validation boreholes at 100m intervals downgradient of ${corridor}. Issue immediate notification for source-pathway chemical containment.`;
-      } else if (cf > 3.0 || igeo > 1.0) {
-        category = 'Considerable Contamination';
-        badgeClass = 'badge-critical';
-        rec = `Schedule quarterly laboratory assays (EPA 3050B ICP-MS). Review industrial discharge effluent permits in ${corridor}.`;
-      } else if (cf > 1.2 || igeo > 0.0) {
-        category = 'Moderate Enrichment';
-        badgeClass = 'badge-moderate';
-        rec = `Increase monitoring density around ${corridor} boundary. Verify soil organic carbon and cation exchange capacity to evaluate bioavailability.`;
+        document.getElementById('risk-eval-metal-title').textContent = `${res.metal.toUpperCase()} (${res.chemical_symbol || ''}) Assessment`;
+        const badgeEl = document.getElementById('risk-eval-badge');
+        badgeEl.className = `badge ${res.severity === 'CRITICAL' || res.severity === 'HIGH' ? 'badge-critical' : res.severity === 'MODERATE' ? 'badge-moderate' : 'badge-safe'}`;
+        badgeEl.textContent = res.risk_tier;
+
+        document.getElementById('risk-eval-cf').textContent = res.contamination_factor_CF !== null ? res.contamination_factor_CF.toFixed(2) : 'N/A';
+        document.getElementById('risk-eval-igeo').textContent = res.geoaccumulation_index_Igeo !== null ? res.geoaccumulation_index_Igeo.toFixed(2) : 'N/A';
+        document.getElementById('risk-eval-explanation').textContent = res.explanation;
+        document.getElementById('risk-eval-recommendation').textContent = res.adaptive_recommendation;
+      } catch (err) {
+        console.warn('Backend /assessment failed; falling back to client-side formula:', err);
+        const info = BASELINES[metal] || BASELINES.chromium;
+        const cf = conc / info.baseline;
+        const igeo = Math.log2(conc / (1.5 * info.baseline));
+
+        let category = 'Uncontaminated / Baseline';
+        let badgeClass = 'badge-safe';
+        let rec = 'Standard routine monitoring. No immediate environmental remediation required.';
+        if (cf > 6.0 || igeo > 2.0) {
+          category = 'Very High Ecological Risk';
+          badgeClass = 'badge-critical';
+          rec = `Deploy 3 radial validation boreholes at 100m intervals downgradient of ${corridor}. Issue immediate notification for source-pathway chemical containment.`;
+        } else if (cf > 3.0 || igeo > 1.0) {
+          category = 'Considerable Contamination';
+          badgeClass = 'badge-critical';
+          rec = `Schedule quarterly laboratory assays (EPA 3050B ICP-MS). Review industrial discharge effluent permits in ${corridor}.`;
+        } else if (cf > 1.2 || igeo > 0.0) {
+          category = 'Moderate Enrichment';
+          badgeClass = 'badge-moderate';
+          rec = `Increase monitoring density around ${corridor} boundary. Verify soil organic carbon and cation exchange capacity to evaluate bioavailability.`;
+        }
+
+        document.getElementById('risk-eval-metal-title').textContent = `${info.name} (${info.symbol}) Assessment`;
+        const badgeEl = document.getElementById('risk-eval-badge');
+        badgeEl.className = `badge ${badgeClass}`;
+        badgeEl.textContent = category;
+
+        document.getElementById('risk-eval-cf').textContent = cf.toFixed(2);
+        document.getElementById('risk-eval-igeo').textContent = igeo.toFixed(2);
+        document.getElementById('risk-eval-explanation').textContent = `The input concentration of ${conc.toFixed(2)} mg/kg is ${cf.toFixed(2)}x the Peninsular India geochemical baseline of ${info.baseline.toFixed(2)} mg/kg. This results in a Geoaccumulation Index (Igeo) of ${igeo.toFixed(2)}.`;
+        document.getElementById('risk-eval-recommendation').textContent = rec;
       }
-
-      document.getElementById('risk-eval-metal-title').textContent = `${info.name} (${info.symbol}) Assessment`;
-      const badgeEl = document.getElementById('risk-eval-badge');
-      badgeEl.className = `badge ${badgeClass}`;
-      badgeEl.textContent = category;
-
-      document.getElementById('risk-eval-cf').textContent = cf.toFixed(2);
-      document.getElementById('risk-eval-igeo').textContent = igeo.toFixed(2);
-      document.getElementById('risk-eval-explanation').textContent = `The input concentration of ${conc.toFixed(2)} mg/kg is ${cf.toFixed(2)}x the Peninsular India geochemical baseline of ${info.baseline.toFixed(2)} mg/kg. This results in a Geoaccumulation Index (Igeo) of ${igeo.toFixed(2)}.`;
-      document.getElementById('risk-eval-recommendation').textContent = rec;
     });
   }
 
@@ -1173,7 +1193,12 @@
     const downloadBtn = document.getElementById('btn-download-report-csv');
     if (downloadBtn) {
       downloadBtn.addEventListener('click', () => {
-        exportSamplesToCSV(state.samples, 'tamil_nadu_soil_pollution_report.csv');
+        const area = document.getElementById('report-scope-area') ? document.getElementById('report-scope-area').value : '';
+        const metal = document.getElementById('report-scope-metal') ? document.getElementById('report-scope-metal').value : '';
+        const q = new URLSearchParams({ format: 'csv' });
+        if (area) q.append('industrial_area', area);
+        if (metal) q.append('metal', metal);
+        window.location.href = `${api.getBaseUrl()}/report/generate?${q.toString()}`;
       });
     }
   }
@@ -1228,8 +1253,17 @@
   // ---------------------------------------------------------------------------
   // SAMPLE DETAILS MODAL
   // ---------------------------------------------------------------------------
-  function openSampleDetailsModal(sampleId) {
-    const sample = state.samples.find(s => s.sample_id === sampleId);
+  async function openSampleDetailsModal(sampleId) {
+    let sample = state.samples.find(s => s.sample_id === sampleId);
+    let srcInfo = null;
+    try {
+      const backendSample = await api.getSampleById(sampleId);
+      if (backendSample) {
+        sample = backendSample;
+        srcInfo = backendSample.source_information;
+      }
+    } catch (_) {}
+
     if (!sample) return;
 
     const modal = document.getElementById('sample-details-modal');
@@ -1242,6 +1276,10 @@
     const hm = sample.heavy_metals || {};
     const sp = sample.soil_properties || {};
 
+    const srcName = srcInfo ? srcInfo.source_name : (sample.source_name || 'Tamil Nadu Environmental Survey');
+    const srcProtocol = srcInfo ? srcInfo.analytical_protocol : (sample.analytical_method || 'EPA 3050B + ICP-MS');
+    const srcLicense = srcInfo ? srcInfo.license : (sample.license || 'Government Open Data License (GODL)');
+
     bodyEl.innerHTML = `
       <div style="display:flex; flex-direction:column; gap:16px;">
         <div style="background:var(--bg-surface); border-radius:var(--radius-md); padding:14px; border:1px solid var(--border-subtle);">
@@ -1251,8 +1289,13 @@
             <div><span style="color:var(--text-muted);">Matrix:</span> <strong>Topsoil (0–15 cm)</strong></div>
             <div><span style="color:var(--text-muted);">Latitude:</span> <strong>${sample.latitude.toFixed(4)}°N</strong></div>
             <div><span style="color:var(--text-muted);">Longitude:</span> <strong>${sample.longitude.toFixed(4)}°E</strong></div>
-            <div><span style="color:var(--text-muted);">QC Status:</span> <strong style="color:var(--primary-green);">VALIDATED</strong></div>
+            <div><span style="color:var(--text-muted);">QC Status:</span> <strong style="color:var(--primary-green);">${sample.qc_status || 'PASSED'}</strong></div>
           </div>
+        </div>
+
+        <div style="background:rgba(34, 211, 238, 0.05); border:1px solid rgba(34, 211, 238, 0.2); border-radius:var(--radius-md); padding:10px 12px; font-size:11.5px;">
+          <div><strong style="color:var(--cyan-accent);">Source:</strong> ${srcName}</div>
+          <div style="color:var(--text-secondary); margin-top:2px;"><strong style="color:var(--text-main);">Protocol:</strong> ${srcProtocol} &bull; <strong style="color:var(--text-main);">License:</strong> ${srcLicense}</div>
         </div>
 
         <div>
@@ -1270,7 +1313,12 @@
             <tbody>
               ${['chromium', 'lead', 'cadmium', 'nickel', 'arsenic', 'copper', 'zinc'].map(m => {
                 const info = BASELINES[m];
-                const conc = hm[m] !== null && hm[m] !== undefined ? hm[m] : null;
+                let conc = null;
+                if (sample.heavy_metal_results && sample.heavy_metal_results[m]) {
+                  conc = sample.heavy_metal_results[m].concentration_mg_kg;
+                } else if (hm[m] !== null && hm[m] !== undefined) {
+                  conc = hm[m];
+                }
                 const concStr = conc !== null ? conc.toFixed(2) : '<span style="color:var(--text-muted);">N/A (unmeasured)</span>';
                 const cf = conc !== null ? (conc / info.baseline).toFixed(2) : 'N/A';
                 return `
@@ -1292,19 +1340,19 @@
           <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:8px; font-size:11.5px;">
             <div style="background:var(--bg-surface); padding:8px 10px; border-radius:var(--radius-sm);">
               <div style="color:var(--text-muted);">pH</div>
-              <div style="font-weight:700; color:var(--text-main); font-size:14px;">${sp.ph ? sp.ph.toFixed(1) : '7.4'}</div>
+              <div style="font-weight:700; color:var(--text-main); font-size:14px;">${sp.soil_ph || sp.ph ? (sp.soil_ph || sp.ph).toFixed(1) : '7.4'}</div>
             </div>
             <div style="background:var(--bg-surface); padding:8px 10px; border-radius:var(--radius-sm);">
               <div style="color:var(--text-muted);">EC (dS/m)</div>
-              <div style="font-weight:700; color:var(--text-main); font-size:14px;">${sp.electrical_conductivity_ds_m ? sp.electrical_conductivity_ds_m.toFixed(2) : '0.42'}</div>
+              <div style="font-weight:700; color:var(--text-main); font-size:14px;">${sp.soil_ec_dSm || sp.electrical_conductivity_ds_m ? (sp.soil_ec_dSm || sp.electrical_conductivity_ds_m).toFixed(2) : '0.42'}</div>
             </div>
             <div style="background:var(--bg-surface); padding:8px 10px; border-radius:var(--radius-sm);">
               <div style="color:var(--text-muted);">OC (g/kg)</div>
-              <div style="font-weight:700; color:var(--text-main); font-size:14px;">${sp.organic_carbon_g_kg ? sp.organic_carbon_g_kg.toFixed(1) : '5.8'}</div>
+              <div style="font-weight:700; color:var(--text-main); font-size:14px;">${sp.soc_pct || sp.organic_carbon_g_kg ? (sp.soc_pct || sp.organic_carbon_g_kg).toFixed(1) : '5.8'}</div>
             </div>
             <div style="background:var(--bg-surface); padding:8px 10px; border-radius:var(--radius-sm);">
               <div style="color:var(--text-muted);">Texture</div>
-              <div style="font-weight:700; color:var(--text-main); font-size:14px;">Clay Loam</div>
+              <div style="font-weight:700; color:var(--text-main); font-size:14px;">${sp.texture_class || 'Clay Loam'}</div>
             </div>
           </div>
         </div>

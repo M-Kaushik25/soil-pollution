@@ -54,12 +54,20 @@ const api = {
     return fetchJson("/health");
   },
 
+  async getDashboardSummary() {
+    return fetchJson("/dashboard/summary");
+  },
+
   async getManifest() {
     return fetchJson("/manifest");
   },
 
   async getMetals() {
     return fetchJson("/metals");
+  },
+
+  async getMetalStatistics(metal) {
+    return fetchJson(`/metals/${encodeURIComponent(metal)}/statistics`);
   },
 
   async getIndustrialAreas() {
@@ -87,11 +95,48 @@ const api = {
     if (params.source) q.append("source", params.source);
     if (params.sample_matrix) q.append("sample_matrix", params.sample_matrix);
     if (params.qc_status) q.append("qc_status", params.qc_status);
+    if (params.search) q.append("search", params.search);
+    if (params.sort_by) q.append("sort_by", params.sort_by);
+    if (params.sort_order) q.append("sort_order", params.sort_order);
     return fetchJson(`/samples?${q.toString()}`);
   },
 
-  async getPollutionMap(maxPoints = 400) {
-    return fetchJson(`/pollution-map?max_points=${maxPoints}`);
+  async getSampleById(sampleId) {
+    return fetchJson(`/samples/${encodeURIComponent(sampleId)}`);
+  },
+
+  async getPollutionMap(params = {}) {
+    const q = new URLSearchParams();
+    if (typeof params === "number") {
+      q.append("max_points", params);
+    } else {
+      if (params.maxPoints) q.append("max_points", params.maxPoints);
+      if (params.district) q.append("district", params.district);
+      if (params.industrial_area) q.append("industrial_area", params.industrial_area);
+      if (params.metal) q.append("metal", params.metal);
+    }
+    return fetchJson(`/pollution-map?${q.toString()}`);
+  },
+
+  async getSoilHealth(params = {}) {
+    const q = new URLSearchParams();
+    if (params.district) q.append("district", params.district);
+    if (params.industrial_area) q.append("industrial_area", params.industrial_area);
+    if (params.sample_id) q.append("sample_id", params.sample_id);
+    if (params.limit) q.append("limit", params.limit);
+    if (params.offset) q.append("offset", params.offset);
+    return fetchJson(`/soil-health?${q.toString()}`);
+  },
+
+  async assessRisk(payload) {
+    return fetchJson("/assessment", {
+      method: "POST",
+      body: JSON.stringify(payload)
+    });
+  },
+
+  async getDataSources() {
+    return fetchJson("/data-sources");
   },
 
   async predictSoil(payload, metal = "chromium") {
