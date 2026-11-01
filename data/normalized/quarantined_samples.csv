@@ -1,0 +1,4 @@
+sample_id,original_sample_id,source_id,latitude,longitude,district,industrial_area,sampling_year,sample_matrix,quarantine_reason,qc_status
+TN_RAW_QRN_001,RNP-DISCHARGE-W01,SRC_TNPCB_RANIPET_SIPCOT_2023,12.928,79.331,Ranipet,Ranipet SIPCOT,2023,effluent,Quarantined non-soil sample matrix: 'effluent'. Excluded from topsoil heavy-metal baseline calculations.,QUARANTINED_NON_SOIL_MATRIX
+TN_RAW_QRN_002,NOYYAL-SED-01,SRC_TIRUPPUR_NOYYAL_BASIN_2023,11.109,77.339,Tiruppur,Tiruppur,2023,sediment,Quarantined non-soil sample matrix: 'sediment'. Excluded from topsoil heavy-metal baseline calculations.,QUARANTINED_NON_SOIL_MATRIX
+TN_RAW_QRN_003,CDL-VEG-LEAF-01,SRC_CUDDALORE_SIPCOT_SURVEY_2023,11.688,79.759,Cuddalore,Cuddalore SIPCOT,2023,vegetation,Quarantined non-soil sample matrix: 'vegetation'. Excluded from topsoil heavy-metal baseline calculations.,QUARANTINED_NON_SOIL_MATRIX

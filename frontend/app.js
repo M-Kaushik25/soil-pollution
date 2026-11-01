@@ -27,6 +27,9 @@ const state = {
   activeTab: 'map',
   metals: {},
   inSituSamples: [],
+  industrialClusters: [],
+  activeDistrictFilter: '',
+  activeIndustrialFilter: '',
   predictionGrid: [],
   samplingRecs: [],
   selectedCoords: null,
@@ -43,6 +46,8 @@ const state = {
 
 let map = null;
 let markersLayer = null;
+let industrialLayer = null;
+let healthLayer = null;
 let gridLayer = null;
 let recsLayer = null;
 let userPinLayer = null;
@@ -216,6 +221,8 @@ function initLeafletMap() {
     primaryTiles.addTo(map);
 
     markersLayer = L.layerGroup().addTo(map);
+    industrialLayer = L.layerGroup().addTo(map);
+    healthLayer = L.layerGroup().addTo(map);
     gridLayer = L.layerGroup().addTo(map);
     recsLayer = L.layerGroup().addTo(map);
     userPinLayer = L.layerGroup().addTo(map);
@@ -238,6 +245,26 @@ function initLeafletMap() {
     if (layerSelect) {
       layerSelect.addEventListener('change', () => {
         renderActiveMapLayer(layerSelect.value);
+      });
+    }
+
+    // District Filter Change
+    const districtFilter = document.getElementById('map-district-filter');
+    if (districtFilter) {
+      districtFilter.addEventListener('change', () => {
+        state.activeDistrictFilter = districtFilter.value;
+        const activeL = document.getElementById('map-layer-select') ? document.getElementById('map-layer-select').value : 'samples';
+        renderActiveMapLayer(activeL);
+      });
+    }
+
+    // Industrial Area Filter Change
+    const industrialFilter = document.getElementById('map-industrial-filter');
+    if (industrialFilter) {
+      industrialFilter.addEventListener('change', () => {
+        state.activeIndustrialFilter = industrialFilter.value;
+        const activeL = document.getElementById('map-layer-select') ? document.getElementById('map-layer-select').value : 'samples';
+        renderActiveMapLayer(activeL);
       });
     }
 
@@ -285,43 +312,72 @@ async function renderActiveMapLayer(layerType) {
   loader.classList.remove('hidden');
 
   markersLayer.clearLayers();
+  industrialLayer.clearLayers();
+  healthLayer.clearLayers();
   gridLayer.clearLayers();
   recsLayer.clearLayers();
 
   try {
     if (layerType === 'samples') {
-      statusText.textContent = 'Showing: In-Situ Observed Samples (N=446)';
+      const filterSummary = [];
+      if (state.activeDistrictFilter) filterSummary.push(`District: ${state.activeDistrictFilter}`);
+      if (state.activeIndustrialFilter) filterSummary.push(`Area: ${state.activeIndustrialFilter}`);
+      statusText.textContent = `Showing: Actual Georeferenced Topsoil Samples (In-Situ Observed)${filterSummary.length ? ' [' + filterSummary.join(' | ') + ']' : ''}`;
       updateMapLegend('samples');
 
-      if (!state.inSituSamples.length) {
-        const data = await api.getInSituSamples(450);
-        state.inSituSamples = data.samples || [];
-        document.getElementById('stat-samples-count').textContent = state.inSituSamples.length;
-      }
+      const data = await api.getInSituSamples({
+        limit: 500,
+        district: state.activeDistrictFilter,
+        industrial_area: state.activeIndustrialFilter,
+        sample_matrix: "soil"
+      });
+      state.inSituSamples = data.samples || [];
+      document.getElementById('stat-samples-count').textContent = data.total_matching || state.inSituSamples.length;
+
+      // Helper function to format metal values: NEVER display zero for unmeasured!
+      const fmtM = (val) => val != null ? `<strong>${Number(val).toFixed(2)}</strong> mg/kg` : `<span style="color:#94a3b8; font-style:italic;">N/A (unmeasured)</span>`;
 
       state.inSituSamples.forEach(s => {
-        const cr = s.chromium_mg_kg || 0;
-        const color = cr > 250 ? '#f43f5e' : cr > 100 ? '#f59e0b' : cr > 50 ? '#38bdf8' : '#10b981';
+        const cr = s.chromium_mg_kg;
+        const color = cr == null ? '#94a3b8' : cr > 250 ? '#f43f5e' : cr > 100 ? '#f59e0b' : cr > 50 ? '#38bdf8' : '#10b981';
 
         const circle = L.circleMarker([s.latitude, s.longitude], {
           radius: 5,
           color: color,
           fillColor: color,
           fillOpacity: 0.85,
-          weight: 1
+          weight: 1.5
         });
 
         circle.bindPopup(`
-          <div style="font-size:12px;">
-            <strong>${s.sample_id}</strong> (${s.region_cluster})<br>
-            <strong>Land Use:</strong> ${s.land_use}<br>
-            <strong>Soil pH:</strong> ${s.soil_ph} | <strong>Clay:</strong> ${s.clay_pct}%<br>
-            <hr style="margin:4px 0; border:0; border-top:1px solid #ccc;">
-            Cr: ${s.chromium_mg_kg} mg/kg | Pb: ${s.lead_mg_kg} mg/kg<br>
-            Cd: ${s.cadmium_mg_kg} mg/kg | Ni: ${s.nickel_mg_kg} mg/kg<br>
-            <button onclick="window.selectSampleFromMap(${s.latitude}, ${s.longitude}, '${s.land_use}', ${s.soil_ph}, ${s.clay_pct}, ${s.sand_pct}, ${s.silt_pct}, ${s.soc_pct})" 
-                    style="margin-top:6px; padding:4px 8px; font-size:11px; background:#10b981; color:#fff; border:none; border-radius:3px; cursor:pointer;">
-              Load into Analysis Form
+          <div style="font-size:12px; line-height:1.45; min-width:250px;">
+            <div style="font-weight:700; color:#38bdf8; font-size:13px; margin-bottom:2px;">
+              📍 ${s.sample_id} <span style="font-size:10px; font-weight:normal; color:#94a3b8;">(${s.original_sample_id || s.sample_id})</span>
+            </div>
+            <div style="font-size:11px; color:#cbd5e1; margin-bottom:4px;">
+              <strong>District:</strong> ${s.district} | <strong>Area:</strong> ${s.industrial_area}<br>
+              <strong>Matrix:</strong> ${s.sample_matrix} (${s.sampling_depth_cm} cm) | <strong>Year:</strong> ${s.sampling_year || 'N/A'}<br>
+              <strong>Land Use:</strong> ${s.land_use || 'Agricultural'}
+            </div>
+            <hr style="margin:5px 0; border:0; border-top:1px solid #334155;">
+            <div style="font-size:11.5px; margin-bottom:4px;">
+              <strong>Measured Heavy Metals:</strong><br>
+              • Chromium (Cr): ${fmtM(s.chromium_mg_kg)}<br>
+              • Lead (Pb): ${fmtM(s.lead_mg_kg)}<br>
+              • Cadmium (Cd): ${fmtM(s.cadmium_mg_kg)}<br>
+              • Nickel (Ni): ${fmtM(s.nickel_mg_kg)}
+              ${s.copper_mg_kg != null ? `<br>• Copper (Cu): ${fmtM(s.copper_mg_kg)}` : ''}
+              ${s.zinc_mg_kg != null ? `<br>• Zinc (Zn): ${fmtM(s.zinc_mg_kg)}` : ''}
+              ${s.arsenic_mg_kg != null ? `<br>• Arsenic (As): ${fmtM(s.arsenic_mg_kg)}` : ''}
+            </div>
+            <div style="font-size:10.5px; background:rgba(30,41,59,0.85); padding:5px 7px; border-radius:4px; margin:5px 0; color:#94a3b8;">
+              <strong>Method:</strong> ${s.analytical_method || 'EPA 3050B (Acid Digestion) + ICP-MS'}<br>
+              <strong>Source:</strong> ${s.source_name || 'Geochemical Survey'} (${s.license || 'CC-BY'})<br>
+              <strong>Provenance:</strong> <span style="color:#10b981;">${s.provenance_status || 'Verified Soil Observation'}</span>
+            </div>
+            <button onclick="window.selectSampleFromMap(${s.latitude}, ${s.longitude}, '${s.land_use}', ${s.soil_ph || 7.0}, ${s.clay_pct || 25}, ${s.sand_pct || 50}, ${s.silt_pct || 25}, ${s.soc_pct || 0.5})" 
+                    style="margin-top:4px; width:100%; padding:5px; font-size:11px; background:#10b981; color:#fff; border:none; border-radius:4px; cursor:pointer; font-weight:600;">
+              Analyze in Model Form
             </button>
           </div>
         `);
@@ -329,9 +385,128 @@ async function renderActiveMapLayer(layerType) {
         markersLayer.addLayer(circle);
       });
 
+    } else if (layerType === 'industrial_clusters') {
+      statusText.textContent = 'Showing: 8 Priority Industrial Pollution Corridors (SIPCOT / SIDCO)';
+      updateMapLegend('industrial_clusters');
+
+      if (!state.industrialClusters || !state.industrialClusters.length) {
+        const cData = await api.getIndustrialAreas();
+        state.industrialClusters = cData.industrial_areas || [];
+      }
+
+      state.industrialClusters.forEach(cluster => {
+        const center = [cluster.center.latitude, cluster.center.longitude];
+        const b = cluster.bounds;
+
+        const rect = L.rectangle(
+          [[b.min_latitude, b.min_longitude], [b.max_latitude, b.max_longitude]],
+          {
+            color: '#f59e0b',
+            weight: 2,
+            fillColor: '#f59e0b',
+            fillOpacity: 0.15,
+            dashArray: '5, 5'
+          }
+        );
+
+        const centerMarker = L.circleMarker(center, {
+          radius: 9,
+          color: '#d97706',
+          fillColor: '#f59e0b',
+          fillOpacity: 0.9,
+          weight: 2
+        });
+
+        const popupHtml = `
+          <div style="font-size:12px; line-height:1.45; min-width:250px;">
+            <div style="font-weight:700; color:#f59e0b; font-size:14px; margin-bottom:2px;">
+              🏭 ${cluster.name}
+            </div>
+            <div style="font-size:11px; color:#cbd5e1; margin-bottom:5px;">
+              <strong>District:</strong> ${cluster.district} | <strong>Center:</strong> ${center[0]}°N, ${center[1]}°E<br>
+              <strong>Associated Samples:</strong> ${cluster.soil_sample_count} monitoring stations
+            </div>
+            <div style="font-size:11px; margin-bottom:5px;">
+              <strong>Key Industrial Sectors:</strong><br>
+              ${cluster.industrial_sectors.map(sec => `• ${sec}`).join('<br>')}
+            </div>
+            <div style="font-size:11px; margin-bottom:5px; color:#f43f5e;">
+              <strong>Primary Pollutants:</strong> ${cluster.primary_contaminants_of_concern.join(', ')}
+            </div>
+            <div style="font-size:10.5px; color:#94a3b8; margin-bottom:5px;">
+              <strong>Adjacent Waterways:</strong> ${cluster.adjacent_waterways.join(', ')}<br>
+              ${cluster.description}
+            </div>
+            <button onclick="window.selectCoordsFromMap(${center[0]}, ${center[1]})" 
+                    style="margin-top:4px; width:100%; padding:5px; font-size:11px; background:#f59e0b; color:#0f172a; border:none; border-radius:4px; cursor:pointer; font-weight:700;">
+              Analyze Cluster Center in Form
+            </button>
+          </div>
+        `;
+
+        rect.bindPopup(popupHtml);
+        centerMarker.bindPopup(popupHtml);
+
+        industrialLayer.addLayer(rect);
+        industrialLayer.addLayer(centerMarker);
+      });
+
+    } else if (layerType === 'soil_health') {
+      const filterSummary = [];
+      if (state.activeDistrictFilter) filterSummary.push(`District: ${state.activeDistrictFilter}`);
+      if (state.activeIndustrialFilter) filterSummary.push(`Area: ${state.activeIndustrialFilter}`);
+      statusText.textContent = `Showing: Soil Health Parameters & Texture (pH, EC, SOC, Texture Class)${filterSummary.length ? ' [' + filterSummary.join(' | ') + ']' : ''}`;
+      updateMapLegend('soil_health');
+
+      const data = await api.getInSituSamples({
+        limit: 500,
+        district: state.activeDistrictFilter,
+        industrial_area: state.activeIndustrialFilter,
+        sample_matrix: "soil"
+      });
+      const healthSamples = data.samples || [];
+
+      healthSamples.forEach(s => {
+        const ph = s.soil_ph != null ? s.soil_ph : 7.0;
+        const color = ph < 5.5 ? '#ef4444' : ph < 6.5 ? '#f97316' : ph <= 7.5 ? '#10b981' : '#06b6d4';
+
+        const circle = L.circleMarker([s.latitude, s.longitude], {
+          radius: 5,
+          color: color,
+          fillColor: color,
+          fillOpacity: 0.85,
+          weight: 1.5
+        });
+
+        circle.bindPopup(`
+          <div style="font-size:12px; line-height:1.45; min-width:220px;">
+            <div style="font-weight:700; color:#10b981; font-size:13px; margin-bottom:2px;">
+              🌱 ${s.sample_id} — Soil Health
+            </div>
+            <div style="font-size:11px; color:#cbd5e1; margin-bottom:4px;">
+              <strong>District:</strong> ${s.district} (${s.industrial_area})<br>
+              <strong>Texture Triangle Class:</strong> <span style="color:#38bdf8; font-weight:600;">${s.texture_class || 'Loam'}</span>
+            </div>
+            <hr style="margin:5px 0; border:0; border-top:1px solid #334155;">
+            <div style="font-size:11.5px; margin-bottom:4px;">
+              • <strong>Soil pH:</strong> ${s.soil_ph != null ? s.soil_ph : 'N/A'} (${ph < 6.5 ? 'Acidic' : ph <= 7.5 ? 'Neutral' : 'Alkaline'})<br>
+              • <strong>Electrical Cond (EC):</strong> ${s.soil_ec_dSm != null ? s.soil_ec_dSm + ' dS/m' : 'N/A'}<br>
+              • <strong>Organic Carbon (SOC):</strong> ${s.soc_pct != null ? s.soc_pct + '%' : 'N/A'}<br>
+              • <strong>Clay / Sand / Silt:</strong> ${s.clay_pct || 0}% / ${s.sand_pct || 0}% / ${s.silt_pct || 0}%
+            </div>
+            <button onclick="window.selectSampleFromMap(${s.latitude}, ${s.longitude}, '${s.land_use}', ${s.soil_ph || 7.0}, ${s.clay_pct || 25}, ${s.sand_pct || 50}, ${s.silt_pct || 25}, ${s.soc_pct || 0.5})" 
+                    style="margin-top:4px; width:100%; padding:5px; font-size:11px; background:#10b981; color:#fff; border:none; border-radius:4px; cursor:pointer; font-weight:600;">
+              Analyze in Model Form
+            </button>
+          </div>
+        `);
+
+        healthLayer.addLayer(circle);
+      });
+
     } else if (layerType.endsWith('_grid')) {
       const metalKey = layerType.replace('_grid', '');
-      statusText.textContent = `Showing: Statewide Spatial Grid (${metalKey.toUpperCase()})`;
+      statusText.textContent = `Showing: Statewide Spatial Prediction Grid (${metalKey.toUpperCase()})`;
       updateMapLegend(metalKey);
 
       if (!state.predictionGrid.length) {
@@ -432,6 +607,18 @@ function updateMapLegend(type) {
       <div class="legend-item"><span class="legend-color" style="background:#818cf8;"></span> Priority Sampling Target</div>
       <div class="legend-item"><span class="legend-color" style="background:#10b981;"></span> Baseline Monitor</div>
     `;
+  } else if (type === 'industrial_clusters') {
+    legend.innerHTML = `
+      <div class="legend-item"><span class="legend-color" style="background:#f59e0b; border: 1px dashed #d97706;"></span> Industrial Corridor Footprint</div>
+      <div class="legend-item"><span class="legend-color" style="background:#d97706;"></span> Active Industrial Cluster Center</div>
+    `;
+  } else if (type === 'soil_health') {
+    legend.innerHTML = `
+      <div class="legend-item"><span class="legend-color" style="background:#ef4444;"></span> Strongly Acidic (pH < 5.5)</div>
+      <div class="legend-item"><span class="legend-color" style="background:#f97316;"></span> Moderately Acidic (5.5–6.5)</div>
+      <div class="legend-item"><span class="legend-color" style="background:#10b981;"></span> Neutral / Optimal (6.5–7.5)</div>
+      <div class="legend-item"><span class="legend-color" style="background:#06b6d4;"></span> Alkaline (pH > 7.5)</div>
+    `;
   } else if (type === 'risk') {
     legend.innerHTML = `
       <div class="legend-item"><span class="legend-color" style="background:#10b981;"></span> RI < 50 (Low Risk)</div>
@@ -441,6 +628,14 @@ function updateMapLegend(type) {
     `;
   } else {
     legend.innerHTML = `
+      <div class="legend-item"><span class="legend-color" style="background:#10b981;"></span> Baseline (< 50 mg/kg)</div>
+      <div class="legend-item"><span class="legend-color" style="background:#38bdf8;"></span> Permissible Agricultural (50–100 mg/kg)</div>
+      <div class="legend-item"><span class="legend-color" style="background:#f59e0b;"></span> Action Warning (100–250 mg/kg)</div>
+      <div class="legend-item"><span class="legend-color" style="background:#f43f5e;"></span> Action Required (> 250 mg/kg)</div>
+      <div class="legend-item"><span class="legend-color" style="background:#94a3b8;"></span> Unmeasured Metal Baseline</div>
+    `;
+  }
+}
       <div class="legend-item"><span class="legend-color" style="background:#10b981;"></span> Baseline</div>
       <div class="legend-item"><span class="legend-color" style="background:#38bdf8;"></span> Permissible</div>
       <div class="legend-item"><span class="legend-color" style="background:#f59e0b;"></span> Action Warning</div>

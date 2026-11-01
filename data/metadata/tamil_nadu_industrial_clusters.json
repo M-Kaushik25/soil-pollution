@@ -1,0 +1,121 @@
+{
+  "project": "GeoSoil Insight — Tamil Nadu Industrial Soil Pollution Explorer",
+  "state": "Tamil Nadu",
+  "country": "India",
+  "crs": "EPSG:4326 (WGS 84)",
+  "target_industrial_areas": [
+    {
+      "id": "IND_RANIPET_SIPCOT",
+      "name": "Ranipet SIPCOT",
+      "district": "Ranipet",
+      "center": {"latitude": 12.9260, "longitude": 79.3330},
+      "bounds": {
+        "min_latitude": 12.9000, "max_latitude": 12.9550,
+        "min_longitude": 79.3000, "max_longitude": 79.3650
+      },
+      "industrial_sectors": ["Tanneries", "Chromium Chemicals", "Finished Leather Processing", "Electroplating"],
+      "primary_contaminants_of_concern": ["Chromium (Cr)", "Lead (Pb)", "Cadmium (Cd)"],
+      "adjacent_waterways": ["Palar River Basin"],
+      "description": "SIPCOT Industrial Complex at Ranipet, historically impacted by basic chrome sulfate tanning and hexavalent chromium waste sludge."
+    },
+    {
+      "id": "IND_CUDDALORE_SIPCOT",
+      "name": "Cuddalore SIPCOT",
+      "district": "Cuddalore",
+      "center": {"latitude": 11.6850, "longitude": 79.7620},
+      "bounds": {
+        "min_latitude": 11.6500, "max_latitude": 11.7200,
+        "min_longitude": 79.7300, "max_longitude": 79.7900
+      },
+      "industrial_sectors": ["Chemical Manufacturing", "Pesticides", "Pharmaceuticals", "Dyes & Pigments"],
+      "primary_contaminants_of_concern": ["Lead (Pb)", "Cadmium (Cd)", "Nickel (Ni)"],
+      "adjacent_waterways": ["Uppanar River", "Bay of Bengal Coastline"],
+      "description": "SIPCOT Industrial Complex Phases I & II, renowned chemical and agrochemical cluster along the Uppanar estuary."
+    },
+    {
+      "id": "IND_MANALI_PETROCHEM",
+      "name": "Manali",
+      "district": "Chennai / Tiruvallur",
+      "center": {"latitude": 13.1670, "longitude": 80.2600},
+      "bounds": {
+        "min_latitude": 13.1400, "max_latitude": 13.2000,
+        "min_longitude": 80.2300, "max_longitude": 80.2900
+      },
+      "industrial_sectors": ["Petrochemical Refining", "Fertilizers", "Heavy Organic Chemicals", "Thermal Power"],
+      "primary_contaminants_of_concern": ["Lead (Pb)", "Nickel (Ni)", "Chromium (Cr)"],
+      "adjacent_waterways": ["Buckingham Canal", "Kosathalaiyar River", "Ennore Creek"],
+      "description": "Major petrochemical and industrial corridor north of Chennai containing CPCL refinery, fertilizer complexes, and industrial storage."
+    },
+    {
+      "id": "IND_COIMBATORE_KURICHI",
+      "name": "Coimbatore SIDCO Kurichi",
+      "district": "Coimbatore",
+      "center": {"latitude": 10.9420, "longitude": 76.9740},
+      "bounds": {
+        "min_latitude": 10.9200, "max_latitude": 10.9650,
+        "min_longitude": 76.9500, "max_longitude": 77.0000
+      },
+      "industrial_sectors": ["Electroplating", "Foundries", "Metal Finishing", "Motor Pump Manufacturing", "Engineering"],
+      "primary_contaminants_of_concern": ["Chromium (Cr)", "Nickel (Ni)", "Copper (Cu)", "Zinc (Zn)"],
+      "adjacent_waterways": ["Kurichi Kulam", "Noyyal River Catchment"],
+      "description": "SIDCO Industrial Estate at Kurichi, dense mechanical and electroplating industrial cluster in southern Coimbatore."
+    },
+    {
+      "id": "IND_TIRUPPUR_TEXTILE",
+      "name": "Tiruppur",
+      "district": "Tiruppur",
+      "center": {"latitude": 11.1085, "longitude": 77.3411},
+      "bounds": {
+        "min_latitude": 11.0700, "max_latitude": 11.1500,
+        "min_longitude": 77.3000, "max_longitude": 77.4000
+      },
+      "industrial_sectors": ["Textile Wet Processing", "Bleaching & Dyeing", "Garment Finishing", "Knitting"],
+      "primary_contaminants_of_concern": ["Chromium (Cr)", "Cadmium (Cd)", "Zinc (Zn)", "Copper (Cu)"],
+      "adjacent_waterways": ["Noyyal River", "Nanjarayan Tank"],
+      "description": "India's knitwear capital with intensive textile dyeing units and CETP infrastructure along the Noyyal River basin."
+    },
+    {
+      "id": "IND_METTUR_COMPLEX",
+      "name": "Mettur",
+      "district": "Salem",
+      "center": {"latitude": 11.7920, "longitude": 77.8010},
+      "bounds": {
+        "min_latitude": 11.7600, "max_latitude": 11.8300,
+        "min_longitude": 77.7600, "max_longitude": 77.8400
+      },
+      "industrial_sectors": ["Chlor-Alkali", "Aluminium Smelting", "Thermal Power Generation", "Specialty Chemicals"],
+      "primary_contaminants_of_concern": ["Lead (Pb)", "Chromium (Cr)", "Nickel (Ni)"],
+      "adjacent_waterways": ["Cauvery River Downstream of Stanley Reservoir"],
+      "description": "Heavy industrial cluster situated downstream of Mettur Dam with chlor-alkali, plastics, thermal power, and metallurgy plants."
+    },
+    {
+      "id": "IND_ERODE_TEXTILE_LEATHER",
+      "name": "Erode",
+      "district": "Erode",
+      "center": {"latitude": 11.3410, "longitude": 77.7172},
+      "bounds": {
+        "min_latitude": 11.3000, "max_latitude": 11.3900,
+        "min_longitude": 77.6700, "max_longitude": 77.7600
+      },
+      "industrial_sectors": ["Textile Processing", "Tanneries", "Printing & Dyeing", "Chemical Processing"],
+      "primary_contaminants_of_concern": ["Chromium (Cr)", "Lead (Pb)", "Cadmium (Cd)"],
+      "adjacent_waterways": ["Kalingarayan Canal", "Cauvery River"],
+      "description": "Agrarian-industrial zone in Western Tamil Nadu with textile wet processing units and tanneries intersecting historic irrigation canals."
+    },
+    {
+      "id": "IND_THOOTHUKUDI_SIPCOT",
+      "name": "Thoothukudi SIPCOT",
+      "district": "Thoothukudi",
+      "center": {"latitude": 8.8120, "longitude": 78.1320},
+      "bounds": {
+        "min_latitude": 8.7800, "max_latitude": 8.8500,
+        "min_longitude": 78.0900, "max_longitude": 78.1700
+      },
+      "industrial_sectors": ["Copper Smelting & Metallurgy", "Chemical Manufacturing", "Thermal Power", "Fertilizers"],
+      "primary_contaminants_of_concern": ["Lead (Pb)", "Cadmium (Cd)", "Arsenic (As)", "Copper (Cu)"],
+      "adjacent_waterways": ["Gulf of Mannar Coastal Zone", "Therku Veerapandiapuram"],
+      "description": "SIPCOT Industrial Complex at Thoothukudi hosting metallurgical smelters, heavy chemical manufacturers, and coastal power generation."
+    }
+  ]
+}
+

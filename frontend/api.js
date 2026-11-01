@@ -62,8 +62,32 @@ const api = {
     return fetchJson("/metals");
   },
 
-  async getInSituSamples(limit = 450) {
-    return fetchJson(`/samples?limit=${limit}`);
+  async getIndustrialAreas() {
+    return fetchJson("/industrial-areas");
+  },
+
+  async getAnalyticsSummary(params = {}) {
+    const q = new URLSearchParams();
+    if (params.district) q.append("district", params.district);
+    if (params.industrial_area) q.append("industrial_area", params.industrial_area);
+    if (params.metal) q.append("metal", params.metal);
+    return fetchJson(`/analytics/summary?${q.toString()}`);
+  },
+
+  async getInSituSamples(params = 500) {
+    if (typeof params === "number") {
+      return fetchJson(`/samples?limit=${params}`);
+    }
+    const q = new URLSearchParams();
+    if (params.limit) q.append("limit", params.limit);
+    if (params.offset) q.append("offset", params.offset);
+    if (params.district) q.append("district", params.district);
+    if (params.industrial_area) q.append("industrial_area", params.industrial_area);
+    if (params.metal) q.append("metal", params.metal);
+    if (params.source) q.append("source", params.source);
+    if (params.sample_matrix) q.append("sample_matrix", params.sample_matrix);
+    if (params.qc_status) q.append("qc_status", params.qc_status);
+    return fetchJson(`/samples?${q.toString()}`);
   },
 
   async getPollutionMap(maxPoints = 400) {

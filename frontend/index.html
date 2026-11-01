@@ -78,16 +78,51 @@
           </div>
 
           <div class="map-controls-group">
-            <label for="map-layer-select">Active Layer:</label>
-            <select id="map-layer-select" class="form-select">
-              <option value="samples">📍 In-Situ Observed Samples (N=446)</option>
-              <option value="risk_grid">🗺️ Statewide Potential Ecological Risk (RI)</option>
-              <option value="cr_grid">🟡 Chromium (Cr) Spatial Grid</option>
-              <option value="pb_grid">🔵 Lead (Pb) Spatial Grid</option>
-              <option value="cd_grid">🟠 Cadmium (Cd) Spatial Grid</option>
-              <option value="ni_grid">🟣 Nickel (Ni) Spatial Grid</option>
-              <option value="recommendations">🎯 Adaptive Sampling Targets</option>
-            </select>
+            <div class="control-item">
+              <label for="map-layer-select">Active Layer:</label>
+              <select id="map-layer-select" class="form-select">
+                <option value="samples">📍 In-Situ Soil Samples (Actual Georeferenced)</option>
+                <option value="industrial_clusters">🏭 Industrial Pollution Corridors (8 Target Zones)</option>
+                <option value="soil_health">🌱 Soil Health & Texture (pH, EC, SOC, Clay)</option>
+                <option value="risk_grid">🗺️ Statewide Potential Ecological Risk (RI)</option>
+                <option value="cr_grid">🟡 Chromium (Cr) Spatial Grid</option>
+                <option value="pb_grid">🔵 Lead (Pb) Spatial Grid</option>
+                <option value="cd_grid">🟠 Cadmium (Cd) Spatial Grid</option>
+                <option value="ni_grid">🟣 Nickel (Ni) Spatial Grid</option>
+                <option value="recommendations">🎯 Adaptive Sampling Targets</option>
+              </select>
+            </div>
+
+            <div class="control-item">
+              <label for="map-district-filter">District:</label>
+              <select id="map-district-filter" class="form-select">
+                <option value="">All Districts</option>
+                <option value="Ranipet">Ranipet</option>
+                <option value="Cuddalore">Cuddalore</option>
+                <option value="Chennai">Chennai / Tiruvallur</option>
+                <option value="Coimbatore">Coimbatore</option>
+                <option value="Tiruppur">Tiruppur</option>
+                <option value="Salem">Salem</option>
+                <option value="Erode">Erode</option>
+                <option value="Thoothukudi">Thoothukudi</option>
+                <option value="Cauvery Delta">Thanjavur / Cauvery Delta</option>
+              </select>
+            </div>
+
+            <div class="control-item">
+              <label for="map-industrial-filter">Industrial Area:</label>
+              <select id="map-industrial-filter" class="form-select">
+                <option value="">All Industrial Areas</option>
+                <option value="Ranipet SIPCOT">Ranipet SIPCOT</option>
+                <option value="Cuddalore SIPCOT">Cuddalore SIPCOT</option>
+                <option value="Manali">Manali Industrial Area</option>
+                <option value="Coimbatore SIDCO Kurichi">Coimbatore SIDCO Kurichi</option>
+                <option value="Tiruppur">Tiruppur Textile Belt</option>
+                <option value="Mettur">Mettur Industrial Complex</option>
+                <option value="Erode">Erode Industrial Corridor</option>
+                <option value="Thoothukudi SIPCOT">Thoothukudi SIPCOT</option>
+              </select>
+            </div>
           </div>
         </div>
 
@@ -128,14 +163,17 @@
             <div id="form-error-banner" class="alert-box error hidden"></div>
 
             <form id="soil-analysis-form" novalidate>
-              <!-- Presets -->
+              <!-- Presets for 8 Target Industrial Corridors -->
               <div class="preset-strip">
-                <span class="preset-label">Quick Presets:</span>
+                <span class="preset-label">Industrial Presets:</span>
+                <button type="button" class="preset-btn" data-lat="12.9260" data-lon="79.3330" data-lu="Industrial">Ranipet SIPCOT</button>
+                <button type="button" class="preset-btn" data-lat="11.6850" data-lon="79.7620" data-lu="Industrial">Cuddalore SIPCOT</button>
+                <button type="button" class="preset-btn" data-lat="13.1670" data-lon="80.2600" data-lu="Industrial">Manali</button>
+                <button type="button" class="preset-btn" data-lat="10.9420" data-lon="76.9740" data-lu="Industrial">Coimbatore Kurichi</button>
                 <button type="button" class="preset-btn" data-lat="11.1085" data-lon="77.3411" data-lu="Industrial-Adjacent">Tiruppur</button>
-                <button type="button" class="preset-btn" data-lat="12.9248" data-lon="79.3330" data-lu="Industrial-Adjacent">Ranipet</button>
-                <button type="button" class="preset-btn" data-lat="10.7870" data-lon="79.1378" data-lu="Agricultural">Cauvery Delta</button>
-                <button type="button" class="preset-btn" data-lat="11.6643" data-lon="78.1460" data-lu="Industrial-Adjacent">Salem</button>
-                <button type="button" class="preset-btn" data-lat="13.2015" data-lon="80.3012" data-lu="Urban/Peri-Urban">Chennai-Ennore</button>
+                <button type="button" class="preset-btn" data-lat="11.7920" data-lon="77.8010" data-lu="Industrial">Mettur</button>
+                <button type="button" class="preset-btn" data-lat="11.3410" data-lon="77.7172" data-lu="Industrial-Adjacent">Erode</button>
+                <button type="button" class="preset-btn" data-lat="8.8120" data-lon="78.1320" data-lu="Industrial">Thoothukudi SIPCOT</button>
               </div>
 
               <!-- Location Coordinates -->
