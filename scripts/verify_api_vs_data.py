@@ -44,3 +44,4 @@ for metal in ["chromium", "lead", "cadmium", "nickel", "arsenic", "copper", "zin
     print(f"Metal: {metal}")
     print(f"  Parquet: N={len(valid_vals)}, min={c_min:.2f}, max={c_max:.2f}, mean={c_mean:.2f}, med={c_med:.2f}, std={c_std:.2f}, CF={cf_mean:.2f}, Igeo={igeo_mean:.2f}")
     print(f"  API    : N={api_d['valid_sample_count']}, min={api_d['min']:.2f}, max={api_d['max']:.2f}, mean={api_d['mean']:.2f}, med={api_d['median']:.2f}, std={api_d['std_dev']:.2f}, CF={api_d['average_contamination_factor']:.2f}, Igeo={api_d['mean_geoaccumulation_index_Igeo']:.2f}")
+

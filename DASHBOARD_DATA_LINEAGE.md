@@ -201,3 +201,4 @@ All 7 data lineage audit tests passed:
    - Spatial block cross-validation demonstrates negative out-of-corridor $R^2$ scores across all four target heavy metals. The machine learning model should not be used as a standalone certified laboratory chemical assay (EPA 3050B ICP-MS) for unmonitored rural agrarian plots.
 3. **Agronomic Nutrient Scope**:
    - Available Nitrogen (N) and Available Phosphorus (P) are not part of trace heavy-metal acid digestion suites and remain as contextual regional agronomic benchmark reference values rather than field-measured assays.
+

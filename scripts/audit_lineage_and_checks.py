@@ -98,3 +98,4 @@ df_rf = df_spatial[df_spatial["model"] == "Random Forest"]
 print(f"Spatial CV results in CSV for Random Forest:\n{df_rf[['target', 'Random_CV_R2_mean', 'Spatial_CV_R2_mean']]}")
 
 print("\nAll automated checks passed successfully!")
+
