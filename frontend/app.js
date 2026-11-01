@@ -68,11 +68,17 @@
   // ---------------------------------------------------------------------------
   // Lifecycle Initialization
   // ---------------------------------------------------------------------------
-  document.addEventListener('DOMContentLoaded', () => {
+  function bootApp() {
     initSidebar();
     initHeader();
     initDataAndApp();
-  });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', bootApp);
+  } else {
+    bootApp();
+  }
 
   // ---------------------------------------------------------------------------
   // Navigation & Shell Interactions
